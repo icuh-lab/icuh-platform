@@ -4,9 +4,9 @@ name: icuh-platform CI flow
 # 2. 워크플로우가 시작될 조건 지정
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "main" ]
 
 jobs:
   build:
