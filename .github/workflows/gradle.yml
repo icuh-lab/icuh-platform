@@ -81,8 +81,8 @@ jobs:
         ssh -i "icuh-platform-key.pem" -o StrictHostKeyChecking=no ${{secrets.SSH_EC2_USER}}@${{secrets.SSH_EC2_HOST}} << EOF
           docker login -u ${{ secrets.DOCKER_HUB_ID }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
           docker pull ${{ secrets.DOCKER_HUB_ID }}/${{ secrets.DOCKER_HUB_REPO }}:latest
-          docker stop app
-          docker rm app
+          docker stop icuh_platform
+          docker rm icuh_platform
           docker run -d --name icuh_platform -p 8080:8080 ${{ secrets.DOCKER_HUB_ID }}/${{ secrets.DOCKER_HUB_REPO }}:latest
         EOF
 
