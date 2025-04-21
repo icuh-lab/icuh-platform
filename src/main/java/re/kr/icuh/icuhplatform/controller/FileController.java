@@ -8,6 +8,6 @@ public class FileController {
 
     @GetMapping("/test")
     public String test() {
-        return "hello world";
+        return "hello world testsetsetsets";
     }
 }
