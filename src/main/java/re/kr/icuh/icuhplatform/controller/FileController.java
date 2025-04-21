@@ -8,6 +8,6 @@ public class FileController {
 
     @GetMapping("/test")
     public String test() {
-        return "hello world testsetsetsets";
+        return "hello world docker hub ssh add";
     }
 }
