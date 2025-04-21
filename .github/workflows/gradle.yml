@@ -83,7 +83,7 @@ jobs:
           docker pull ${{ secrets.DOCKER_HUB_ID }}/${{ secrets.DOCKER_HUB_REPO }}:latest
           docker stop app
           docker rm app
-          docker run -d --name app -p 8080:8080 ${{ secrets.DOCKER_HUB_ID }}/${{ secrets.DOCKER_HUB_REPO }}:latest
+          docker run -d --name icuh_platform -p 8080:8080 ${{ secrets.DOCKER_HUB_ID }}/${{ secrets.DOCKER_HUB_REPO }}:latest
         EOF
 
     - name: Remove Github Actions IP From Security Group
