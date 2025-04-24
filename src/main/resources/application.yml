@@ -13,3 +13,18 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
+
+logging:
+  file: # ?? ?? ?? ??
+    name: /logs/app.log
+    path: /logs
+  level: # ?? ?? ??
+    root: INFO
+    com.yourcompany: DEBUG
+    org.springframework: WARN
+  logback:
+    rollingpolicy: # ?? ?? ?? ??
+      file-name-pattern: /logs/app-%d{yyyy-MM-dd}-%i.log
+      max-file-size: 10MB
+      max-history: 30
+      total-size-cap: 300MB
