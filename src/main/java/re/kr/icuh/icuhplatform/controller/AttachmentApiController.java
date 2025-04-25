@@ -8,6 +8,6 @@ public class AttachmentApiController {
 
     @GetMapping("/test")
     public String test() {
-        return "hello world docker hub ssh add";
+        return "<h1> 안녕하세요 가뭄 정보 빅데이터 플랫폼에 오신 것을 환영합니다. </h1>";
     }
 }
