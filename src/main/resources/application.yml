@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/actual_drght?allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://localhost:3306/ACTUAL_DRGHT?allowPublicKeyRetrieval=true&useSSL=false
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: 1q2w3e4r
@@ -13,6 +13,14 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+  config:
+    import: application-private.yml
 
 logging:
   file: # ?? ?? ?? ??
@@ -28,3 +36,6 @@ logging:
       max-file-size: 10MB
       max-history: 30
       total-size-cap: 300MB
+
+file:
+  dir: /Users/icuh/Desktop/file_upload_test
