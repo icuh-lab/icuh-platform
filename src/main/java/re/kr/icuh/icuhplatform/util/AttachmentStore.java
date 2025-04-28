@@ -1,6 +1,7 @@
 package re.kr.icuh.icuhplatform.util;
 
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +12,7 @@ import re.kr.icuh.icuhplatform.dto.CreateAttachmentDto;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -21,15 +23,8 @@ public class AttachmentStore {
 
     private final S3Config s3Config;
 
-    @Value("${file.dir}")
-    private String fileDir;
-
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucket;
-
-    public String getFullPath(String filename) {
-        return fileDir + filename;
-    }
 
     public List<CreateAttachmentDto> storeFiles(List<MultipartFile> files) throws IOException {
         List<CreateAttachmentDto> storeFileResult = new ArrayList<>();
@@ -42,34 +37,35 @@ public class AttachmentStore {
     }
 
     public CreateAttachmentDto storeFile(MultipartFile file) throws IOException {
-
         if (file.isEmpty()) {
             return null;
         }
 
         String originalName = file.getOriginalFilename();
         String savedName = createStoreFileName(originalName);
-        String savedPath = getFullPath(file.getOriginalFilename());
         String extensionName = extractExtensionName(originalName);
         Integer size = getSize(file.getSize());
 
-        // 로컬에 파일 저장
-        File localFile = new File(getFullPath(savedName));
-
         // S3에 파일 업로드
-        String s3UploadFileName = putS3(savedName, localFile);
+        String savedPath = putS3(savedName, file.getInputStream(), file.getSize(), file.getContentType());
 
         return CreateAttachmentDto.builder()
                 .originalName(originalName)
-                .savedPath(s3UploadFileName)
+                .savedPath(savedPath)
                 .savedName(savedName)
                 .extensionName(extensionName)
                 .size(size)
                 .build();
     }
 
-    private String putS3(String storeFileName, File localFile) {
-        s3Config.amazonS3Client().putObject(new PutObjectRequest(bucket, storeFileName, localFile).withCannedAcl(CannedAccessControlList.PublicRead));
+    private String putS3(String storeFileName, InputStream inputStream, long contentLength, String contentType) {
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(contentLength);
+        metadata.setContentType(contentType);
+
+        PutObjectRequest request = new PutObjectRequest(bucket, storeFileName, inputStream, metadata).withCannedAcl(CannedAccessControlList.PublicRead);
+        s3Config.amazonS3Client().putObject(request);
+
         return s3Config.amazonS3Client().getUrl(bucket, storeFileName).toString();
     }
 
