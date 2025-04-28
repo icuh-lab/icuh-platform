@@ -10,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 import re.kr.icuh.icuhplatform.config.S3Config;
 import re.kr.icuh.icuhplatform.dto.CreateAttachmentDto;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
