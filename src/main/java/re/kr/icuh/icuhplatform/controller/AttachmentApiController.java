@@ -3,10 +3,10 @@ package re.kr.icuh.icuhplatform.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import re.kr.icuh.icuhplatform.dto.AttachmentDto;
 import re.kr.icuh.icuhplatform.service.AttachmentService;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -21,9 +21,9 @@ public class AttachmentApiController {
     }
 
     @PostMapping("/attachments")
-    public String attachments(@RequestPart("attachment") MultipartFile attachmentDto) throws IOException {
+    public String attachments(@RequestPart("attachment") List<MultipartFile> file) throws IOException {
 
-        attachmentService.createAttachment(attachmentDto);
+        attachmentService.createAttachment(file);
 
         return "ok";
     }

@@ -9,6 +9,7 @@ import re.kr.icuh.icuhplatform.repository.AttachmentRepository;
 import re.kr.icuh.icuhplatform.util.AttachmentStore;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -17,11 +18,13 @@ public class AttachmentService {
     private final AttachmentStore attachmentStore;
     private final AttachmentRepository attachmentRepository;
 
-    public void createAttachment(MultipartFile attachmentDtos) throws IOException {
+    public void createAttachment(List<MultipartFile> file) throws IOException {
 
-        CreateAttachmentDto attachmentDto = attachmentStore.storeFile(attachmentDtos);
-        Attachment attachment = attachmentDto.toAttachment(attachmentDto);
+        List<CreateAttachmentDto> attachmentDtos = attachmentStore.storeFiles(file);
 
-        attachmentRepository.save(attachment);
+        for (CreateAttachmentDto attachmentDto : attachmentDtos) {
+            Attachment attachment = attachmentDto.toAttachment(attachmentDto);
+            attachmentRepository.save(attachment);
+        }
     }
 }
