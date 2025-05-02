@@ -20,7 +20,7 @@ public class AttachmentService {
 
     public void createAttachment(List<MultipartFile> file) throws IOException {
 
-        List<CreateAttachmentDto> attachmentDtos = attachmentStore.storeFiles(file);
+        List<CreateAttachmentDto> attachmentDtos = attachmentStore.storeAttachments(file);
 
         for (CreateAttachmentDto attachmentDto : attachmentDtos) {
             Attachment attachment = attachmentDto.toAttachment(attachmentDto);
