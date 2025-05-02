@@ -1,5 +1,6 @@
 package re.kr.icuh.icuhplatform.util;
 
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -8,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import re.kr.icuh.icuhplatform.config.S3Config;
 import re.kr.icuh.icuhplatform.dto.CreateAttachmentDto;
 
 import java.io.IOException;
@@ -22,7 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AttachmentStore {
 
-    private final S3Config s3Config;
+    private final AmazonS3Client amazonS3Client;
 
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucket;
@@ -67,14 +67,14 @@ public class AttachmentStore {
         metadata.setContentType(contentType);
 
         PutObjectRequest request = new PutObjectRequest(bucket, storeFileName, inputStream, metadata).withCannedAcl(CannedAccessControlList.PublicRead);
-        s3Config.amazonS3Client().putObject(request);
+        amazonS3Client.putObject(request);
 
-        return s3Config.amazonS3Client().getUrl(bucket, storeFileName).toString();
+        return amazonS3Client.getUrl(bucket, storeFileName).toString();
     }
 
     private void rollbackS3(String savedName) {
         try {
-            s3Config.amazonS3Client().deleteObject(bucket, savedName);
+            amazonS3Client.deleteObject(bucket, savedName);
         } catch (Exception e) {
             log.error("[AttachmentStore][rollbackS3] S3 롤백 실패: {}", savedName, e);
         }
