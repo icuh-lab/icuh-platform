@@ -11,7 +11,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
+import re.kr.icuh.icuhplatform.common.util.FileUtils;
 import re.kr.icuh.icuhplatform.dto.CreateAttachmentDto;
+import re.kr.icuh.icuhplatform.service.S3FileUploader;
 
 import java.io.IOException;
 import java.net.URL;
@@ -24,18 +26,21 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class AttachmentStoreTest {
+class S3FileUploaderTest {
 
     @Mock
     private AmazonS3Client amazonS3Client;
 
+    @Mock
+    private FileUtils fileUtils;
+
     @InjectMocks
-    private AttachmentStore attachmentStore;
+    private S3FileUploader s3FileUploader;
 
     @BeforeEach
     void setUp() {
-        attachmentStore = new AttachmentStore(amazonS3Client);
-        ReflectionTestUtils.setField(attachmentStore, "bucket", "test-bucket");
+        s3FileUploader = new S3FileUploader(fileUtils, amazonS3Client);
+        ReflectionTestUtils.setField(s3FileUploader, "bucket", "test-bucket");
     }
 
     @Test
@@ -57,7 +62,7 @@ class AttachmentStoreTest {
 
 
         // When
-        CreateAttachmentDto result = attachmentStore.storeAttachment(mockMultipartFile);
+        CreateAttachmentDto result = s3FileUploader.storeAttachment(mockMultipartFile);
 
         // Then
         assertNotNull(result);
@@ -96,7 +101,7 @@ class AttachmentStoreTest {
                 );
 
         // When
-        List<CreateAttachmentDto> results = attachmentStore.storeAttachments(multipartFiles);
+        List<CreateAttachmentDto> results = s3FileUploader.storeAttachments(multipartFiles);
 
         // Then
         assertNotNull(results);
@@ -132,7 +137,7 @@ class AttachmentStoreTest {
         // Then
         assertThrows(IOException.class, () -> {
             // When
-            attachmentStore.storeAttachment(mockMultipartFile);
+            s3FileUploader.storeAttachment(mockMultipartFile);
         });
     }
 
@@ -152,7 +157,7 @@ class AttachmentStoreTest {
 
         // When & Then
         assertThrows(IOException.class, () -> {
-            attachmentStore.storeAttachment(mockMultipartFile);
+            s3FileUploader.storeAttachment(mockMultipartFile);
         });
 
         // 롤백 메소드 호출 확인

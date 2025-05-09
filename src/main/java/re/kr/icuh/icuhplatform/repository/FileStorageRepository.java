@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import re.kr.icuh.icuhplatform.domain.Attachment;
 
 @Repository
-public interface AttachmentRepository extends JpaRepository<Attachment,Long> {
+public interface FileStorageRepository extends JpaRepository<Attachment,Long> {
 }
