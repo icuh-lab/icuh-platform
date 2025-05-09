@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import re.kr.icuh.icuhplatform.common.FileMetadata;
+import re.kr.icuh.icuhplatform.common.FileUtils;
 import re.kr.icuh.icuhplatform.dto.CreateAttachmentDto;
 
 import java.io.File;
@@ -20,8 +22,9 @@ import java.util.UUID;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AttachmentStore {
+public class S3FileUploader {
 
+    private final FileUtils fileUtils;
     private final AmazonS3Client amazonS3Client;
 
     @Value("${spring.cloud.aws.s3.bucket}")
@@ -38,26 +41,23 @@ public class AttachmentStore {
     }
 
     public CreateAttachmentDto storeAttachment(MultipartFile file) throws IOException {
-        String originalName = file.getOriginalFilename();
-        String savedName = createStoreFileName(originalName);
-        String extensionName = extractExtensionName(originalName);
-        Integer size = getSize(file.getSize());
+        FileMetadata metadata = fileUtils.createFileMetadata(file);
 
         // S3에 파일 업로드
         String savedPath = null;
         try {
-            savedPath = putS3(savedName, file.getInputStream(), file.getSize(), file.getContentType());
+            savedPath = putS3(metadata.getSavedName(), file.getInputStream(), file.getSize(), file.getContentType());
         } catch (Exception e) {
-            rollbackS3(savedName);
+            rollbackS3(metadata.getSavedName());
             throw new IOException("[AttachmentStore][storeFile] 파일 업로드 중 오류 발생", e);
         }
 
         return CreateAttachmentDto.builder()
-                .originalName(originalName)
+                .originalName(metadata.getOriginalName())
                 .savedPath(savedPath)
-                .savedName(savedName)
-                .extensionName(extensionName)
-                .size(size)
+                .savedName(metadata.getSavedName())
+                .extensionName(metadata.getExtensionName())
+                .size(metadata.getSize())
                 .build();
     }
 
@@ -152,23 +152,6 @@ public class AttachmentStore {
         } catch (Exception e) {
             log.error("[AttachmentStore][rollbackS3] S3 롤백 실패: {}", savedName, e);
         }
-    }
-
-    private String createStoreFileName(String originName) {
-        String extensionName = extractExtensionName(originName);
-        String uuid = UUID.randomUUID().toString();
-
-        return uuid + "." + extensionName;
-    }
-
-    private String extractExtensionName(String originName) {
-        int position = originName.lastIndexOf(".");
-
-        return originName.substring(position + 1);
-    }
-
-    private Integer getSize(long size) {
-        return Long.valueOf(size).intValue();
     }
 
     // 파일 이름 생성 메소드
