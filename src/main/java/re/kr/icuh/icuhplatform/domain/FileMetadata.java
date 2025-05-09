@@ -1,4 +1,4 @@
-package re.kr.icuh.icuhplatform.common;
+package re.kr.icuh.icuhplatform.domain;
 
 import lombok.AccessLevel;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package re.kr.icuh.icuhplatform.util;
+package re.kr.icuh.icuhplatform.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
@@ -7,8 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import re.kr.icuh.icuhplatform.common.FileMetadata;
-import re.kr.icuh.icuhplatform.common.FileUtils;
+import re.kr.icuh.icuhplatform.common.util.FileUtils;
+import re.kr.icuh.icuhplatform.domain.FileMetadata;
 import re.kr.icuh.icuhplatform.dto.CreateAttachmentDto;
 
 import java.io.File;

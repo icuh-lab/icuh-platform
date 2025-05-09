@@ -1,7 +1,8 @@
-package re.kr.icuh.icuhplatform.common;
+package re.kr.icuh.icuhplatform.common.util;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import re.kr.icuh.icuhplatform.domain.FileMetadata;
 
 import java.io.File;
 import java.io.IOException;
