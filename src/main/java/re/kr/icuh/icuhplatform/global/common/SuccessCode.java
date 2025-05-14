@@ -1,4 +1,4 @@
-package re.kr.icuh.icuhplatform.global.exception;
+package re.kr.icuh.icuhplatform.global.common;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
