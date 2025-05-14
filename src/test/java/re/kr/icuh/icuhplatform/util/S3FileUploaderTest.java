@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
-import re.kr.icuh.icuhplatform.common.util.FileUtils;
+import re.kr.icuh.icuhplatform.global.util.FileUtils;
 import re.kr.icuh.icuhplatform.dto.CreateAttachmentDto;
 import re.kr.icuh.icuhplatform.service.S3FileUploader;
 
