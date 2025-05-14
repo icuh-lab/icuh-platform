@@ -1,4 +1,4 @@
-package re.kr.icuh.icuhplatform.common.util;
+package re.kr.icuh.icuhplatform.global.util;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
