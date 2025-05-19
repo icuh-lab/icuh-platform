@@ -4,15 +4,14 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
-import re.kr.icuh.icuhplatform.global.exception.S3Exception;
-import re.kr.icuh.icuhplatform.global.util.FileUtils;
 import re.kr.icuh.icuhplatform.domain.Attachment;
 import re.kr.icuh.icuhplatform.domain.FileMetadata;
 import re.kr.icuh.icuhplatform.dto.CreateAttachmentDto;
+import re.kr.icuh.icuhplatform.global.exception.BusinessException;
+import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
+import re.kr.icuh.icuhplatform.global.util.FileUtils;
 import re.kr.icuh.icuhplatform.repository.FileStorageRepository;
 
 import java.io.File;
@@ -43,7 +42,7 @@ public class FileStorageService {
         }
     }
 
-    public void uploadLargeFile(MultipartFile multipartFile) throws FileUploadException {
+    public void uploadLargeFile(MultipartFile multipartFile) {
         validateNull(multipartFile);
         validateExtension(multipartFile);
 
@@ -55,7 +54,7 @@ public class FileStorageService {
             String fileUrl = uploadToS3(tempFile);
             saveFileMetadata(metadata, fileUrl);
         } catch (Exception e) {
-            throw new S3Exception(ErrorCode.FILE_READ_ERROR);
+            throw new BusinessException(ErrorCode.FILE_SIZE_EXCEEDED, e.getMessage());
         } finally {
             fileUtils.deleteTempFile(tempFile);
         }
@@ -65,7 +64,7 @@ public class FileStorageService {
         try {
             return fileUtils.convertToTempFile(multipartFile);
         } catch (IOException | RuntimeException e) {
-            throw new S3Exception(ErrorCode.MULTIPART_TO_FILE_ERROR);
+            throw new BusinessException(ErrorCode.UNSUPPORTED_FILE_TYPE, e.getMessage());
         }
     }
 
@@ -73,7 +72,7 @@ public class FileStorageService {
         try {
             return fileUtils.createFileMetadata(multipartFile);
         } catch (IllegalArgumentException e) {
-            throw new S3Exception(ErrorCode.FILE_METADATA_CREATE_FAIL);
+            throw new BusinessException(ErrorCode.UNSUPPORTED_FILE_TYPE, e.getMessage());
         }
     }
 
@@ -81,9 +80,9 @@ public class FileStorageService {
         try {
             return s3FileUploader.uploadLargeAttachment(tempFile);
         } catch (AmazonServiceException ase) {
-            throw new S3Exception(ErrorCode.FILE_UPLOAD_FAIL_SERVER);
+            throw new BusinessException(ErrorCode.UNSUPPORTED_FILE_TYPE, ase.getMessage());
         } catch (SdkClientException sce) {
-            throw new S3Exception(ErrorCode.FILE_UPLOAD_FAIL_CLIENT);
+            throw new BusinessException(ErrorCode.UNSUPPORTED_FILE_TYPE, sce.getMessage());
         }
     }
 
@@ -102,13 +101,13 @@ public class FileStorageService {
 
     private void validateNull(MultipartFile multipartFile) {
         if (multipartFile == null || multipartFile.isEmpty()) {
-            throw new S3Exception(ErrorCode.FILE_NOT_EXIST);
+            throw new BusinessException(ErrorCode.FILE_NOT_FOUND);
         }
     }
 
     private void validateExtension(MultipartFile multipartFile) {
         if (multipartFile.getOriginalFilename().endsWith(".exe") || multipartFile.getOriginalFilename().endsWith(".dmg")) {
-            throw new S3Exception(ErrorCode.NOT_SUPPORT_EXTENSION);
+            throw new BusinessException(ErrorCode.UNSUPPORTED_FILE_TYPE);
         }
     }
 }
