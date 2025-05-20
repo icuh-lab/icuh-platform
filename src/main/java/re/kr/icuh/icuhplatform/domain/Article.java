@@ -1,16 +1,17 @@
 package re.kr.icuh.icuhplatform.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.testcontainers.shaded.com.google.common.hash.Hashing;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static re.kr.icuh.icuhplatform.domain.Article.ArticleStatus.ACTIVE;
 
 @Entity
 @Table(name = "articles")
@@ -66,6 +67,24 @@ public class Article {
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FileEntity> files = new ArrayList<>();
+
+    @Builder
+    public Article(String title, String description, String author, String authorOrganization, String department, String tempPassword, Integer views, ArticleStatus status, Classification classification, ServiceType serviceType) {
+        this.title = title;
+        this.description = description;
+        this.author = author;
+        this.authorOrganization = authorOrganization;
+        this.department = department;
+        this.tempPassword = sha256Encode(tempPassword);
+        this.views = views == null ? 0 : views;
+        this.status = status == null ? ACTIVE : status;
+        this.classification = classification;
+        this.serviceType = serviceType;
+    }
+
+    public String sha256Encode(String tempPassword) {
+        return Hashing.sha256().hashString(tempPassword, StandardCharsets.UTF_8).toString();
+    }
 
     // 소프트 삭제 메서드
     public void softDelete() {
