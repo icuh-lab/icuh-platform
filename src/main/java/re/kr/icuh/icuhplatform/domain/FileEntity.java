@@ -2,7 +2,7 @@ package re.kr.icuh.icuhplatform.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @Table(name = "files")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class FileEntity {
 
     @Id
@@ -24,20 +23,20 @@ public class FileEntity {
     @JoinColumn(name = "article_id", nullable = false)
     private Article article;
 
-    @Column(nullable = false, length = 255, name = "original_filename")
+    @Column(name = "original_filename")
     private String originalFilename;
 
-    @Column(nullable = false, length = 255, name = "stored_filename")
+    @Column(name = "stored_filename")
     private String storedFilename;
 
-    @Column(nullable = false, length = 512, name = "file_path")
+    @Column(name = "file_path")
     private String filePath;
 
     @Column(name = "file_size")
     private Long fileSize;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false, name = "created_at")
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
@@ -47,6 +46,17 @@ public class FileEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "extension_id", nullable = false)
     private Extension extension;
+
+    @Builder
+    public FileEntity(Article article, String originalFilename, String storedFilename, String filePath, Long fileSize, Extension extension) {
+        this.article = article;
+        this.originalFilename = originalFilename;
+        this.storedFilename = storedFilename;
+        this.filePath = filePath;
+        this.fileSize = fileSize;
+        this.status = FileStatus.ACTIVE;
+        this.extension = extension;
+    }
 
     // 소프트 삭제 메서드
     public void softDelete() {
