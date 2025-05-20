@@ -32,11 +32,11 @@ public class FileUtils {
     /**
      * 파일 크기를 Integer로 변환합니다.
      */
-    public Integer convertToIntegerSize(long size) {
+    public Long convertToIntegerSize(long size) {
         if (size > Integer.MAX_VALUE) {
             throw new IllegalArgumentException("File size is too large to convert to Integer");
         }
-        return Long.valueOf(size).intValue();
+        return size;
     }
 
     /**
