@@ -6,12 +6,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import re.kr.icuh.icuhplatform.domain.Attachment;
-import re.kr.icuh.icuhplatform.domain.FileMetadata;
+import re.kr.icuh.icuhplatform.domain.*;
 import re.kr.icuh.icuhplatform.dto.CreateAttachmentDto;
 import re.kr.icuh.icuhplatform.global.exception.BusinessException;
 import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
 import re.kr.icuh.icuhplatform.global.util.FileUtils;
+import re.kr.icuh.icuhplatform.repository.ExtensionRepository;
+import re.kr.icuh.icuhplatform.repository.FileRepository;
 import re.kr.icuh.icuhplatform.repository.FileStorageRepository;
 
 import java.io.File;
@@ -26,8 +27,11 @@ public class FileStorageService {
     private final FileUtils fileUtils;
     private final S3FileUploader s3FileUploader;
     private final FileStorageRepository fileStorageRepository;
+    private final FileRepository fileRepository;
+    private final ExtensionRepository extensionRepository;
 
-    public void createAttachment(List<MultipartFile> file) throws IOException {
+
+    public void createFile(List<MultipartFile> file) throws IOException {
 
         for (MultipartFile multipartFile : file) {
             validateNull(multipartFile);
@@ -42,17 +46,20 @@ public class FileStorageService {
         }
     }
 
-    public void uploadLargeFile(MultipartFile multipartFile) {
-        validateNull(multipartFile);
-        validateExtension(multipartFile);
+    public void uploadLargeFiles(List<MultipartFile> files, Article article) {
+        for (MultipartFile file : files) {
+            uploadLargeFile(file, article);
+        }
+    }
 
+    private void uploadLargeFile(MultipartFile multipartFile, Article article) {
         File tempFile = null;
 
         try {
             tempFile = convertToTempFile(multipartFile);
             FileMetadata metadata = createFileMetadata(multipartFile);
             String fileUrl = uploadToS3(tempFile);
-            saveFileMetadata(metadata, fileUrl);
+            saveFileMetadataToFileEntity(metadata, fileUrl, article);
         } catch (Exception e) {
             throw new BusinessException(ErrorCode.FILE_SIZE_EXCEEDED, e.getMessage());
         } finally {
@@ -86,17 +93,22 @@ public class FileStorageService {
         }
     }
 
-    private void saveFileMetadata(FileMetadata fileMetadata, String fileUrl) {
-        CreateAttachmentDto dto = CreateAttachmentDto.builder()
-            .originalName(fileMetadata.getOriginalName())
-            .savedPath(fileUrl)
-            .savedName(fileMetadata.getSavedName())
-            .extensionName(fileMetadata.getExtensionName())
-            .size(fileMetadata.getSize())
-            .build();
+    private void saveFileMetadataToFileEntity(FileMetadata fileMetadata, String fileUrl, Article article) {
 
-        Attachment attachment = dto.toAttachment(dto);
-        fileStorageRepository.save(attachment);
+        // Extension 가져오기
+        Extension extension = extensionRepository.findByName(fileMetadata.getExtensionName())
+                .orElseThrow(() -> new BusinessException(ErrorCode.UNSUPPORTED_FILE_TYPE));
+
+        FileEntity fileEntity = FileEntity.builder()
+                .article(article)
+                .originalFilename(fileMetadata.getOriginalName())
+                .storedFilename(fileMetadata.getSavedName())
+                .filePath(fileUrl)
+                .fileSize(fileMetadata.getSize())
+                .extension(extension)
+                .build();
+
+        fileRepository.save(fileEntity);
     }
 
     private void validateNull(MultipartFile multipartFile) {
