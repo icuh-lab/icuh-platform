@@ -12,12 +12,12 @@ public class FileMetadata {
     private String originalName;    // 원본 파일명
     private String savedName;       // 저장된 파일명 (UUID)
     private String extensionName;   // 파일 확장자
-    private Integer size;           // 파일 크기
+    private Long size;           // 파일 크기
     private String contentType;     // 파일 타입 (MIME type)
 
     @Builder
     public FileMetadata(String originalName, String savedName,
-                        String extensionName, Integer size, String contentType) {
+                        String extensionName, Long size, String contentType) {
         this.originalName = originalName;
         this.savedName = savedName;
         this.extensionName = extensionName;
