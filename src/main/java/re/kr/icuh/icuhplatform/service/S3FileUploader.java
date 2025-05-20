@@ -7,9 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import re.kr.icuh.icuhplatform.global.util.FileUtils;
 import re.kr.icuh.icuhplatform.domain.FileMetadata;
 import re.kr.icuh.icuhplatform.dto.CreateAttachmentDto;
+import re.kr.icuh.icuhplatform.global.util.FileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -57,7 +57,6 @@ public class S3FileUploader {
                 .savedPath(savedPath)
                 .savedName(metadata.getSavedName())
                 .extensionName(metadata.getExtensionName())
-                .size(metadata.getSize())
                 .build();
     }
 
