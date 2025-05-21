@@ -16,9 +16,8 @@ public class FileUtils {
      * UUID를 사용하여 고유한 파일명을 생성합니다.
      */
     public String createStoreFileName(String originName) {
-        String extensionName = extractExtensionName(originName);
         String uuid = UUID.randomUUID().toString();
-        return uuid + "." + extensionName;
+        return uuid + "_" + originName;
     }
 
     /**

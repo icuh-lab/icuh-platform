@@ -27,8 +27,8 @@ public class ArticleService {
      * 4. 3번 스텝이 끝나면 files -> 변환 -> fileEntity DB에 저장, CreateArticle -> 변환 -> article DB에 저장
      */
 
-    private final ArticleRepository articleRepository;
     private final FileStorageService fileStorageService;
+    private final ArticleRepository articleRepository;
     private final ClassificationRepository classificationRepository;
     private final ServiceTypeRepository serviceTypeRepository;
 

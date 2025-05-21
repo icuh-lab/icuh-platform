@@ -60,12 +60,9 @@ public class S3FileUploader {
                 .build();
     }
 
-    public String uploadLargeAttachment(File file) {
-
-        String fileName = createFileName(file.getName());
-
+    public String uploadLargeAttachment(File file, String savedName) throws IOException {
         // 1단계: Multipart Upload 초기화
-        InitiateMultipartUploadRequest initiateRequest = new InitiateMultipartUploadRequest(bucket, fileName)
+        InitiateMultipartUploadRequest initiateRequest = new InitiateMultipartUploadRequest(bucket, savedName)
                 .withCannedACL(CannedAccessControlList.PublicRead);
 
         InitiateMultipartUploadResult initResult = amazonS3Client.initiateMultipartUpload(initiateRequest);
@@ -90,7 +87,7 @@ public class S3FileUploader {
 
                     UploadPartRequest uploadRequest = new UploadPartRequest()
                             .withBucketName(bucket)
-                            .withKey(fileName)
+                            .withKey(savedName)
                             .withUploadId(uploadId)
                             .withPartNumber(partNumber)
                             .withInputStream(inputStream)
@@ -109,14 +106,14 @@ public class S3FileUploader {
             // 3단계: Multipart Upload 완료
             CompleteMultipartUploadRequest completeRequest = new CompleteMultipartUploadRequest(
                     bucket,
-                    fileName,
+                    savedName,
                     uploadId,
                     partETags
             );
 
             amazonS3Client.completeMultipartUpload(completeRequest);
 
-            String fileUrl = amazonS3Client.getUrl(bucket, fileName).toString();
+            String fileUrl = amazonS3Client.getUrl(bucket, savedName).toString();
             log.info("Multipart Upload 완료 - URL: {}", fileUrl);
 
             return fileUrl;
@@ -126,7 +123,7 @@ public class S3FileUploader {
             log.error("Multipart Upload 실패", e);
             amazonS3Client.abortMultipartUpload(new AbortMultipartUploadRequest(
                     bucket,
-                    fileName,
+                    savedName,
                     uploadId
             ));
             throw new RuntimeException("파일 업로드 실패", e);
@@ -151,11 +148,6 @@ public class S3FileUploader {
         } catch (Exception e) {
             log.error("[AttachmentStore][rollbackS3] S3 롤백 실패: {}", savedName, e);
         }
-    }
-
-    // 파일 이름 생성 메소드
-    private String createFileName(String originalFileName) {
-        return UUID.randomUUID().toString() + "_" + originalFileName;
     }
 
 }
