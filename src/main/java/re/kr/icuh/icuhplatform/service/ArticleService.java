@@ -4,14 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import re.kr.icuh.icuhplatform.domain.Article;
-import re.kr.icuh.icuhplatform.domain.Classification;
-import re.kr.icuh.icuhplatform.domain.ServiceType;
+import re.kr.icuh.icuhplatform.domain.DocumentType;
+import re.kr.icuh.icuhplatform.domain.SubjectDomain;
 import re.kr.icuh.icuhplatform.dto.article.CreateArticleRequest;
 import re.kr.icuh.icuhplatform.global.exception.BusinessException;
 import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
 import re.kr.icuh.icuhplatform.repository.ArticleRepository;
-import re.kr.icuh.icuhplatform.repository.ClassificationRepository;
-import re.kr.icuh.icuhplatform.repository.ServiceTypeRepository;
+import re.kr.icuh.icuhplatform.repository.DocumentTypeRepository;
+import re.kr.icuh.icuhplatform.repository.SubjectDomainRepository;
 
 import java.util.List;
 
@@ -29,16 +29,16 @@ public class ArticleService {
 
     private final FileStorageService fileStorageService;
     private final ArticleRepository articleRepository;
-    private final ClassificationRepository classificationRepository;
-    private final ServiceTypeRepository serviceTypeRepository;
+    private final DocumentTypeRepository documentTypeRepository;
+    private final SubjectDomainRepository subjectDomainRepository;
 
     public void createArticle(CreateArticleRequest request, List<MultipartFile> files) {
         validateFiles(files);
 
-        Classification classification = classificationRepository.findById(request.classificationId())
+        DocumentType documentType = documentTypeRepository.findById(request.classificationId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.CLASSIFICATION_NOT_FOUND));
 
-        ServiceType serviceType = serviceTypeRepository.findById(request.serviceTypeId())
+        SubjectDomain subjectDomain = subjectDomainRepository.findById(request.serviceTypeId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.SERVICE_TYPE_NOT_FOUND));
 
 
@@ -51,8 +51,8 @@ public class ArticleService {
                 .tempPassword(request.tempPassword())
                 .views(0)
                 .status(Article.ArticleStatus.ACTIVE)
-                .classification(classification)
-                .serviceType(serviceType)
+                .documentType(documentType)
+                .subjectDomain(subjectDomain)
                 .build();
 
         Article savedArticle = articleRepository.save(article);
