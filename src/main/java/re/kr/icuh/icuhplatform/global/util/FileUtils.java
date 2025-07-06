@@ -17,7 +17,7 @@ public class FileUtils {
      */
     public String createStoreFileName(String originName) {
         String uuid = UUID.randomUUID().toString();
-        return uuid + "_" + originName;
+        return uuid + "." + extractExtensionName(originName);
     }
 
     /**
