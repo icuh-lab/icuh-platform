@@ -58,18 +58,18 @@ public class Article {
     private ArticleStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "classification_id")
-    private Classification classification;
+    @JoinColumn(name = "document_type_id")
+    private DocumentType documentType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "service_type_id")
-    private ServiceType serviceType;
+    @JoinColumn(name = "subject_domain_id")
+    private SubjectDomain subjectDomain;
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FileEntity> files = new ArrayList<>();
 
     @Builder
-    public Article(String title, String description, String author, String authorOrganization, String department, String tempPassword, Integer views, ArticleStatus status, Classification classification, ServiceType serviceType) {
+    public Article(String title, String description, String author, String authorOrganization, String department, String tempPassword, Integer views, ArticleStatus status, DocumentType documentType, SubjectDomain subjectDomain) {
         this.title = title;
         this.description = description;
         this.author = author;
@@ -78,8 +78,8 @@ public class Article {
         this.tempPassword = sha256Encode(tempPassword);
         this.views = views == null ? 0 : views;
         this.status = status == null ? ACTIVE : status;
-        this.classification = classification;
-        this.serviceType = serviceType;
+        this.documentType = documentType;
+        this.subjectDomain = subjectDomain;
     }
 
     public String sha256Encode(String tempPassword) {
