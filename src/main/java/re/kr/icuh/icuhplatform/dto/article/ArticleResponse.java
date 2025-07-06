@@ -35,8 +35,8 @@ public record ArticleResponse(
                 article.getCreatedAt(),
                 article.getUpdatedAt(),
                 article.getViews(),
-                ClassificationResponse.fromEntity(article.getClassification()),
-                ServiceTypeResponse.fromEntity(article.getServiceType()),
+                ClassificationResponse.fromEntity(article.getDocumentType()),
+                ServiceTypeResponse.fromEntity(article.getSubjectDomain()),
                 article.getFiles().stream()
                         .filter(file -> file.getStatus() == FileEntity.FileStatus.ACTIVE)
                         .map(FileResponse::fromEntity)
