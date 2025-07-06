@@ -1,11 +1,14 @@
 package re.kr.icuh.icuhplatform.service;
 
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import re.kr.icuh.icuhplatform.domain.Article;
 import re.kr.icuh.icuhplatform.domain.DocumentType;
 import re.kr.icuh.icuhplatform.domain.SubjectDomain;
+import re.kr.icuh.icuhplatform.dto.article.ArticleListResponse;
+import re.kr.icuh.icuhplatform.dto.article.ArticleResponse;
 import re.kr.icuh.icuhplatform.dto.article.CreateArticleRequest;
 import re.kr.icuh.icuhplatform.global.exception.BusinessException;
 import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
@@ -71,5 +74,18 @@ public class ArticleService {
                 throw new BusinessException(ErrorCode.UNSUPPORTED_FILE_TYPE);
             }
         }
+    }
+
+    public List<ArticleListResponse> findArticles() {
+
+        List<Article> articles = articleRepository.findAll();
+
+        List<ArticleListResponse> articleResponses = new ArrayList<>();
+
+        for (Article article : articles) {
+            articleResponses.add(ArticleListResponse.fromEntity(article));
+        }
+
+        return articleResponses;
     }
 }
