@@ -2,9 +2,9 @@ package re.kr.icuh.icuhplatform.dto.article;
 
 import re.kr.icuh.icuhplatform.domain.Article;
 import re.kr.icuh.icuhplatform.domain.FileEntity;
-import re.kr.icuh.icuhplatform.dto.classification.ClassificationResponse;
+import re.kr.icuh.icuhplatform.dto.documenttype.DocumentTypeResponse;
 import re.kr.icuh.icuhplatform.dto.file.FileResponse;
-import re.kr.icuh.icuhplatform.dto.servicetype.ServiceTypeResponse;
+import re.kr.icuh.icuhplatform.dto.subjectdomain.SubjectDomainResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,8 +20,8 @@ public record ArticleResponse(
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         Integer views,
-        ClassificationResponse classification,
-        ServiceTypeResponse serviceType,
+        DocumentTypeResponse classification,
+        SubjectDomainResponse serviceType,
         List<FileResponse> files
 ) {
     public static ArticleResponse fromEntity(Article article) {
@@ -35,8 +35,8 @@ public record ArticleResponse(
                 article.getCreatedAt(),
                 article.getUpdatedAt(),
                 article.getViews(),
-                ClassificationResponse.fromEntity(article.getClassification()),
-                ServiceTypeResponse.fromEntity(article.getServiceType()),
+                DocumentTypeResponse.fromEntity(article.getDocumentType()),
+                SubjectDomainResponse.fromEntity(article.getSubjectDomain()),
                 article.getFiles().stream()
                         .filter(file -> file.getStatus() == FileEntity.FileStatus.ACTIVE)
                         .map(FileResponse::fromEntity)

@@ -2,6 +2,7 @@ package re.kr.icuh.icuhplatform.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +24,8 @@ public class S3FileUploader {
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String uploadLargeAttachment(File file, String savedName) {
+    public String uploadFile(File file, String savedName) {
+
         // 1단계: Multipart Upload 초기화
         InitiateMultipartUploadRequest initiateRequest = new InitiateMultipartUploadRequest(bucket, savedName)
                 .withCannedACL(CannedAccessControlList.PublicRead);
@@ -93,5 +95,4 @@ public class S3FileUploader {
         }
 
     }
-
 }

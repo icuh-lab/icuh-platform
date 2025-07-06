@@ -7,11 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "service_types")
+@Table(name = "subject_domains")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class ServiceType {
+public class SubjectDomain {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
