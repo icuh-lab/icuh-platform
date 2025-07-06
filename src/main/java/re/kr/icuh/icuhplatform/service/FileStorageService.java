@@ -40,7 +40,7 @@ public class FileStorageService {
             FileMetadata metadata = fileUtils.createFileMetadata(multipartFile);
             tempFile = fileUtils.convertToTempFile(multipartFile);
 
-            String fileUrl = s3FileUploader.uploadLargeAttachment(tempFile, metadata.getSavedName());
+            String fileUrl = s3FileUploader.uploadFile(tempFile, metadata.getSavedName());
             saveFileMetadataToFileEntity(metadata, fileUrl, article);
         } catch (Exception e) {
             throw new BusinessException(ErrorCode.FILE_SIZE_EXCEEDED, e.getMessage());
