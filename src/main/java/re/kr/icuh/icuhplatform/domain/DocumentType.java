@@ -7,11 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "classifications")
+@Table(name = "document_types")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Classification {
+public class DocumentType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
