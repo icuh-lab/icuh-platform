@@ -2,10 +2,11 @@ package re.kr.icuh.icuhplatform.service;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
+import org.testcontainers.shaded.com.google.common.hash.Hashing;
 import re.kr.icuh.icuhplatform.domain.*;
 import re.kr.icuh.icuhplatform.dto.article.ArticleListResponse;
 import re.kr.icuh.icuhplatform.dto.article.ArticleResponse;
@@ -16,6 +17,7 @@ import re.kr.icuh.icuhplatform.repository.ArticleRepository;
 import re.kr.icuh.icuhplatform.repository.DocumentTypeRepository;
 import re.kr.icuh.icuhplatform.repository.SubjectDomainRepository;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +38,6 @@ public class ArticleService {
     private final DocumentTypeRepository documentTypeRepository;
     private final SubjectDomainRepository subjectDomainRepository;
     private final JPAQueryFactory queryFactory;
-    private final RestClient.Builder builder;
 
     public void createArticle(CreateArticleRequest request, List<MultipartFile> files) {
         validateFiles(files);
@@ -130,5 +131,27 @@ public class ArticleService {
 
 
         return ArticleResponse.fromEntity(article);
+    }
+
+    @Transactional
+    public void deleteArticle(Long id, String tempPassword) {
+
+        QArticle qArticle = QArticle.article;
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (id != null) {
+            builder.and(qArticle.id.eq(id));
+        }
+
+        Article article = queryFactory
+                .selectFrom(qArticle)
+                .where(builder)
+                .fetchOne();
+
+        if (!article.validatePassword(Hashing.sha256().hashString(tempPassword, StandardCharsets.UTF_8).toString())) {
+            throw new BusinessException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        article.softDelete();
     }
 }

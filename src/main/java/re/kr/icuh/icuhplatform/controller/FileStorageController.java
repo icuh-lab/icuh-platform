@@ -52,4 +52,13 @@ public class FileStorageController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PatchMapping("/articles/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public String deleteArticle(@PathVariable Long id, @RequestParam String tempPassword) {
+
+        articleService.deleteArticle(id, tempPassword);
+
+        return "delete Ok";
+    }
 }
