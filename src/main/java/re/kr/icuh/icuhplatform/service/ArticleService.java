@@ -4,7 +4,6 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 import re.kr.icuh.icuhplatform.domain.*;
 import re.kr.icuh.icuhplatform.dto.article.ArticleListResponse;
@@ -36,7 +35,6 @@ public class ArticleService {
     private final DocumentTypeRepository documentTypeRepository;
     private final SubjectDomainRepository subjectDomainRepository;
     private final JPAQueryFactory queryFactory;
-    private final RestClient.Builder builder;
 
     public void createArticle(CreateArticleRequest request, List<MultipartFile> files) {
         validateFiles(files);
