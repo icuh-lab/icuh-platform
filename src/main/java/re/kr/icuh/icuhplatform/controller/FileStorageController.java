@@ -11,6 +11,7 @@ import re.kr.icuh.icuhplatform.dto.article.ArticleListResponse;
 import re.kr.icuh.icuhplatform.dto.article.ArticleResponse;
 import re.kr.icuh.icuhplatform.dto.article.CreateArticleRequest;
 import re.kr.icuh.icuhplatform.global.common.ApiResponse;
+import re.kr.icuh.icuhplatform.global.common.SuccessCode;
 import re.kr.icuh.icuhplatform.service.ArticleService;
 
 import java.io.IOException;
@@ -26,39 +27,23 @@ public class FileStorageController {
 
     @PostMapping("/articles")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public ResponseEntity<String> createArticle(@RequestPart @Valid CreateArticleRequest request, @RequestPart List<MultipartFile> files) throws IOException {
+    public ResponseEntity<ApiResponse<?>> createArticle(@RequestPart @Valid CreateArticleRequest request,
+                                                @RequestPart List<MultipartFile> files) throws IOException {
 
         articleService.createArticle(request, files);
 
-        return ResponseEntity.ok("파일 업로드 성공");
+        return ResponseEntity.ok(ApiResponse.created(SuccessCode.ARTICLE_CREATE_SUCCESS));
     }
 
     @GetMapping("/articles")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ApiResponse<List<ArticleListResponse>>> findArticles(@RequestParam(required = false) String documentType, @RequestParam(required = false) String subjectDomain, @RequestParam(required = false) String source) {
-
-        List<ArticleListResponse> articles = articleService.findArticles(documentType, subjectDomain, source);
-        ApiResponse<List<ArticleListResponse>> response = new ApiResponse<>().success(articles);
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<List<ArticleListResponse>>> findArticles(@RequestParam(required = false) String documentType,
+                                                                               @RequestParam(required = false) String subjectDomain,
+                                                                               @RequestParam(required = false) String source) {
+        return ResponseEntity.ok(ApiResponse.success(articleService.findArticles(documentType, subjectDomain, source)));
     }
 
     @GetMapping("/articles/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ApiResponse<ArticleResponse>> getArticle(@PathVariable Long id) {
-
-        ArticleResponse article = articleService.findArticleById(id);
-        ApiResponse<ArticleResponse> response = new ApiResponse<>().success(article);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @DeleteMapping("/articles/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public String deleteArticle(@PathVariable Long id, @RequestParam String tempPassword) {
-
-        articleService.deleteArticle(id, tempPassword);
-
-        return "delete Ok";
+        return ResponseEntity.ok(ApiResponse.success(articleService.findArticleById(id)));
     }
 }
