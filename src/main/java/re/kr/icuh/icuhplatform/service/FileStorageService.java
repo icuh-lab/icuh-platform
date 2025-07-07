@@ -1,7 +1,5 @@
 package re.kr.icuh.icuhplatform.service;
 
-import java.io.File;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +13,9 @@ import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
 import re.kr.icuh.icuhplatform.global.util.FileUtils;
 import re.kr.icuh.icuhplatform.repository.ExtensionRepository;
 import re.kr.icuh.icuhplatform.repository.FileRepository;
+
+import java.io.File;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -63,6 +64,7 @@ public class FileStorageService {
                 .filePath(fileUrl)
                 .fileSize(fileMetadata.getSize())
                 .extension(extension)
+                .source("국내")
                 .build();
 
         fileRepository.save(fileEntity);
