@@ -11,8 +11,8 @@ public enum ErrorCode {
 	 */
 	INVALID_INPUT(HttpStatus.BAD_REQUEST, "INVALID_INPUT", "유효하지 않은 입력값입니다."),
 	MISSING_REQUIRED_FIELD(HttpStatus.BAD_REQUEST, "MISSING_REQUIRED_FIELD", "필수 필드가 누락되었습니다."),
-	CLASSIFICATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "CLASSIFICATION_NOT_FOUND", "분류체계가 아닙니다."),
-	SERVICE_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "SERVICE_TYPE_NOT_FOUND", "서비스 타입이 아닙니다."),
+	DOCUMENT_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "DOCUMENT_TYPE_NOT_FOUND", "문서 성격을 찾을 수 없습니다. 관리자에게 문의해주세요."),
+	SUBJECT_DOMAIN_NOT_FOUND(HttpStatus.BAD_REQUEST, "SUBJECT_DOMAIN_NOT_FOUND", "주제 영역을 찾을 수 없습니다. 관리자에게 문의해주세요."),
 	/**
 	 * 401 Unauthorized
 	 */
