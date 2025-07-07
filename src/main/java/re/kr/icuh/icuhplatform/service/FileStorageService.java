@@ -64,7 +64,6 @@ public class FileStorageService {
                 .filePath(fileUrl)
                 .fileSize(fileMetadata.getSize())
                 .extension(extension)
-                .source("국내")
                 .build();
 
         fileRepository.save(fileEntity);

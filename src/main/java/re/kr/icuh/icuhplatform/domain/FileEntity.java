@@ -47,11 +47,9 @@ public class FileEntity {
     @JoinColumn(name = "extension_id", nullable = false)
     private Extension extension;
 
-    @Column(name = "source")
-    private String source;
 
     @Builder
-    public FileEntity(Article article, String originalFilename, String storedFilename, String filePath, Long fileSize, Extension extension, String source) {
+    public FileEntity(Article article, String originalFilename, String storedFilename, String filePath, Long fileSize, Extension extension) {
         this.article = article;
         this.originalFilename = originalFilename;
         this.storedFilename = storedFilename;
@@ -59,7 +57,6 @@ public class FileEntity {
         this.fileSize = fileSize;
         this.status = FileStatus.ACTIVE;
         this.extension = extension;
-        this.source = source;
     }
 
     // 소프트 삭제 메서드
