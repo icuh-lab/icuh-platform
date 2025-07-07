@@ -93,6 +93,7 @@ public class Article {
     // 소프트 삭제 메서드
     public void softDelete() {
         this.status = ArticleStatus.DELETED;
+        this.updatedAt = LocalDateTime.now();
     }
 
     // 조회수 증가 메서드
