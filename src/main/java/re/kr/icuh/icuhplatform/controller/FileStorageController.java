@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import re.kr.icuh.icuhplatform.dto.article.ArticleListResponse;
+import re.kr.icuh.icuhplatform.dto.article.ArticleResponse;
 import re.kr.icuh.icuhplatform.dto.article.CreateArticleRequest;
 import re.kr.icuh.icuhplatform.global.common.ApiResponse;
 import re.kr.icuh.icuhplatform.service.ArticleService;
@@ -38,6 +39,16 @@ public class FileStorageController {
 
         List<ArticleListResponse> articles = articleService.findArticles(documentType, subjectDomain, source);
         ApiResponse<List<ArticleListResponse>> response = new ApiResponse<>().success(articles);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/articles/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ApiResponse<ArticleResponse>> getArticle(@PathVariable Long id) {
+
+        ArticleResponse article = articleService.findArticleById(id);
+        ApiResponse<ArticleResponse> response = new ApiResponse<>().success(article);
 
         return ResponseEntity.ok(response);
     }

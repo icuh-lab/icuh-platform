@@ -4,9 +4,11 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 import re.kr.icuh.icuhplatform.domain.*;
 import re.kr.icuh.icuhplatform.dto.article.ArticleListResponse;
+import re.kr.icuh.icuhplatform.dto.article.ArticleResponse;
 import re.kr.icuh.icuhplatform.dto.article.CreateArticleRequest;
 import re.kr.icuh.icuhplatform.global.exception.BusinessException;
 import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
@@ -34,6 +36,7 @@ public class ArticleService {
     private final DocumentTypeRepository documentTypeRepository;
     private final SubjectDomainRepository subjectDomainRepository;
     private final JPAQueryFactory queryFactory;
+    private final RestClient.Builder builder;
 
     public void createArticle(CreateArticleRequest request, List<MultipartFile> files) {
         validateFiles(files);
@@ -109,5 +112,23 @@ public class ArticleService {
         }
 
         return articleResponses;
+    }
+
+    public ArticleResponse findArticleById(Long id) {
+
+        QArticle qArticle = QArticle.article;
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (id != null) {
+            builder.and(qArticle.id.eq(id));
+        }
+
+        Article article = queryFactory
+                .selectFrom(qArticle)
+                .where(builder)
+                .fetchOne();
+
+
+        return ArticleResponse.fromEntity(article);
     }
 }
