@@ -10,5 +10,6 @@ public record CreateArticleRequest(
         @NotNull String department,
         @NotNull String tempPassword,
         @NotNull Long documentTypeId,
-        @NotNull Long subjectDomainId
+        @NotNull Long subjectDomainId,
+        @NotNull String source
 ) {}
