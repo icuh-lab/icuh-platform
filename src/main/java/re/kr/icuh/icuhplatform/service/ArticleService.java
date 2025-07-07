@@ -56,6 +56,7 @@ public class ArticleService {
                 .status(Article.ArticleStatus.ACTIVE)
                 .documentType(documentType)
                 .subjectDomain(subjectDomain)
+                .source(request.source())
                 .build();
 
         Article savedArticle = articleRepository.save(article);
@@ -90,6 +91,10 @@ public class ArticleService {
 
         if (subjectDomain != null) {
             builder.and(qArticle.subjectDomain.eq(qSubjectDomain));
+        }
+
+        if (source != null) {
+            builder.and(qArticle.source.eq(source));
         }
 
         List<Article> articles = queryFactory
