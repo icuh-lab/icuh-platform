@@ -47,6 +47,7 @@ public class FileEntity {
     @JoinColumn(name = "extension_id", nullable = false)
     private Extension extension;
 
+
     @Builder
     public FileEntity(Article article, String originalFilename, String storedFilename, String filePath, Long fileSize, Extension extension) {
         this.article = article;

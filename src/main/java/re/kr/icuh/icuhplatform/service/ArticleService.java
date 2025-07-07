@@ -1,14 +1,12 @@
 package re.kr.icuh.icuhplatform.service;
 
-import java.util.ArrayList;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import re.kr.icuh.icuhplatform.domain.Article;
-import re.kr.icuh.icuhplatform.domain.DocumentType;
-import re.kr.icuh.icuhplatform.domain.SubjectDomain;
+import re.kr.icuh.icuhplatform.domain.*;
 import re.kr.icuh.icuhplatform.dto.article.ArticleListResponse;
-import re.kr.icuh.icuhplatform.dto.article.ArticleResponse;
 import re.kr.icuh.icuhplatform.dto.article.CreateArticleRequest;
 import re.kr.icuh.icuhplatform.global.exception.BusinessException;
 import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
@@ -16,6 +14,7 @@ import re.kr.icuh.icuhplatform.repository.ArticleRepository;
 import re.kr.icuh.icuhplatform.repository.DocumentTypeRepository;
 import re.kr.icuh.icuhplatform.repository.SubjectDomainRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -34,14 +33,15 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
     private final DocumentTypeRepository documentTypeRepository;
     private final SubjectDomainRepository subjectDomainRepository;
+    private final JPAQueryFactory queryFactory;
 
     public void createArticle(CreateArticleRequest request, List<MultipartFile> files) {
         validateFiles(files);
 
-        DocumentType documentType = documentTypeRepository.findById(request.classificationId())
+        DocumentType documentType = documentTypeRepository.findById(request.documentTypeId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.CLASSIFICATION_NOT_FOUND));
 
-        SubjectDomain subjectDomain = subjectDomainRepository.findById(request.serviceTypeId())
+        SubjectDomain subjectDomain = subjectDomainRepository.findById(request.subjectDomainId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.SERVICE_TYPE_NOT_FOUND));
 
 
@@ -56,6 +56,7 @@ public class ArticleService {
                 .status(Article.ArticleStatus.ACTIVE)
                 .documentType(documentType)
                 .subjectDomain(subjectDomain)
+                .source(request.source())
                 .build();
 
         Article savedArticle = articleRepository.save(article);
@@ -76,9 +77,30 @@ public class ArticleService {
         }
     }
 
-    public List<ArticleListResponse> findArticles() {
+    public List<ArticleListResponse> findArticles(String documentType, String  subjectDomain, String source) {
 
-        List<Article> articles = articleRepository.findAll();
+        QArticle qArticle = QArticle.article;
+        BooleanBuilder builder = new BooleanBuilder();
+
+        QDocumentType qDocumentType = qArticle.documentType;
+        QSubjectDomain qSubjectDomain = qArticle.subjectDomain;
+
+        if (documentType != null) {
+            builder.and(qArticle.documentType.eq(qDocumentType));
+        }
+
+        if (subjectDomain != null) {
+            builder.and(qArticle.subjectDomain.eq(qSubjectDomain));
+        }
+
+        if (source != null) {
+            builder.and(qArticle.source.eq(source));
+        }
+
+        List<Article> articles = queryFactory
+                .selectFrom(qArticle)
+                .where(builder)
+                .fetch();
 
         List<ArticleListResponse> articleResponses = new ArrayList<>();
 

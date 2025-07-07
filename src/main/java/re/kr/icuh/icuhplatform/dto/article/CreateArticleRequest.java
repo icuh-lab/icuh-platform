@@ -9,6 +9,7 @@ public record CreateArticleRequest(
         @NotNull String authorOrganization,
         @NotNull String department,
         @NotNull String tempPassword,
-        @NotNull Long classificationId,
-        @NotNull Long serviceTypeId
+        @NotNull Long documentTypeId,
+        @NotNull Long subjectDomainId,
+        @NotNull String source
 ) {}

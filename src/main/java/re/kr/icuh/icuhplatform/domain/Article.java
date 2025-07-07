@@ -65,11 +65,14 @@ public class Article {
     @JoinColumn(name = "subject_domain_id")
     private SubjectDomain subjectDomain;
 
+    @Column(name = "source")
+    private String source;
+
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FileEntity> files = new ArrayList<>();
 
     @Builder
-    public Article(String title, String description, String author, String authorOrganization, String department, String tempPassword, Integer views, ArticleStatus status, DocumentType documentType, SubjectDomain subjectDomain) {
+    public Article(String title, String description, String author, String authorOrganization, String department, String tempPassword, Integer views, ArticleStatus status, DocumentType documentType, SubjectDomain subjectDomain, String source) {
         this.title = title;
         this.description = description;
         this.author = author;
@@ -80,6 +83,7 @@ public class Article {
         this.status = status == null ? ACTIVE : status;
         this.documentType = documentType;
         this.subjectDomain = subjectDomain;
+        this.source = source;
     }
 
     public String sha256Encode(String tempPassword) {
