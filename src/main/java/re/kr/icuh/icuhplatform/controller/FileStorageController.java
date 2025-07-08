@@ -3,6 +3,10 @@ package re.kr.icuh.icuhplatform.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,10 +40,12 @@ public class FileStorageController {
     }
 
     @GetMapping("/articles")
-    public ResponseEntity<ApiResponse<List<ArticleListResponse>>> findArticles(@RequestParam(required = false) String documentType,
+    public ResponseEntity<ApiResponse<Page<ArticleListResponse>>> findArticles(@RequestParam(required = false) String documentType,
                                                                                @RequestParam(required = false) String subjectDomain,
-                                                                               @RequestParam(required = false) String source) {
-        return ResponseEntity.ok(ApiResponse.success(articleService.findArticles(documentType, subjectDomain, source)));
+                                                                               @RequestParam(required = false) String source,
+                                                                               @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        return ResponseEntity.ok(ApiResponse.success(articleService.findArticles(documentType, subjectDomain, source, pageable)));
     }
 
     @GetMapping("/articles/{id}")

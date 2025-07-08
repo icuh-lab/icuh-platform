@@ -1,8 +1,12 @@
 package re.kr.icuh.icuhplatform.service;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -57,7 +61,7 @@ public class ArticleService {
         fileStorageService.uploadLargeFiles(files, savedArticle);
     }
 
-    public List<ArticleListResponse> findArticles(String documentType, String  subjectDomain, String source) {
+    public Page<ArticleListResponse> findArticles(String documentType, String  subjectDomain, String source, Pageable pageable) {
         QArticle article = QArticle.article;
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -78,11 +82,20 @@ public class ArticleService {
                 .leftJoin(article.documentType).fetchJoin()
                 .leftJoin(article.subjectDomain).fetchJoin()
                 .where(builder)
+                .orderBy(article.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
-        return articles.stream()
+        JPAQuery<Long> countQuery = queryFactory
+                .select(article.count())
+                .from(article);
+
+        List<ArticleListResponse> articleListResponses = articles.stream()
                 .map(ArticleListResponse::fromEntity)
                 .collect(Collectors.toList());
+
+        return PageableExecutionUtils.getPage(articleListResponses, pageable, countQuery::fetchOne);
     }
 
     @Transactional
