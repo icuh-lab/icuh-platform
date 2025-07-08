@@ -61,11 +61,11 @@ public class ArticleService {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (documentType != null) {
-            builder.and(article.documentType.name.eq(documentType));
+            builder.and(article.documentType.enName.eq(documentType));
         }
 
         if (subjectDomain != null) {
-            builder.and(article.subjectDomain.name.eq(subjectDomain));
+            builder.and(article.subjectDomain.enName.eq(subjectDomain));
         }
 
         if (source != null) {

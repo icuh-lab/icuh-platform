@@ -19,4 +19,7 @@ public class DocumentType {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "en_name")
+    private String enName;
 }
