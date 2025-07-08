@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import re.kr.icuh.icuhplatform.domain.Article;
 import re.kr.icuh.icuhplatform.domain.DocumentType;
@@ -84,12 +85,16 @@ public class ArticleService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public ArticleResponse findArticleById(Long id) {
         if (!articleRepository.findById(id).isPresent()) {
             throw new BusinessException(ErrorCode.ARTICLE_NOT_FOUND);
         }
 
-        return ArticleResponse.fromEntity(articleRepository.findById(id).get());
+        Article article = articleRepository.findById(id).get();
+        article.increaseViews();
+
+        return ArticleResponse.fromEntity(article);
     }
 
 
