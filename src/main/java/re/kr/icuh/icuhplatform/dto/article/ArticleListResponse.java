@@ -13,7 +13,10 @@ public record ArticleListResponse(
         String authorOrganization,
         LocalDateTime updatedAt,
         Integer views,
-        List<String> extensions
+        List<String> extensions,
+        String documentType,
+        String subjectDomain,
+        String source
 ) {
     public static ArticleListResponse fromEntity(Article article) {
         return new ArticleListResponse(
@@ -25,7 +28,10 @@ public record ArticleListResponse(
                 article.getFiles().stream()
                         .filter(file -> file.getStatus() == FileEntity.FileStatus.ACTIVE)
                         .map(file -> file.getExtension().getName())
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                article.getDocumentType().getEnName(),
+                article.getSubjectDomain().getEnName(),
+                article.getSource()
         );
     }
 }
