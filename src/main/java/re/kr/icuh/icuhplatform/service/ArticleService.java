@@ -10,10 +10,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import re.kr.icuh.icuhplatform.domain.Article;
-import re.kr.icuh.icuhplatform.domain.DocumentType;
-import re.kr.icuh.icuhplatform.domain.QArticle;
-import re.kr.icuh.icuhplatform.domain.SubjectDomain;
+import re.kr.icuh.icuhplatform.domain.*;
 import re.kr.icuh.icuhplatform.dto.article.ArticleListResponse;
 import re.kr.icuh.icuhplatform.dto.article.ArticleResponse;
 import re.kr.icuh.icuhplatform.dto.article.CreateArticleRequest;
@@ -50,7 +47,7 @@ public class ArticleService {
                 .department(request.department())
                 .tempPassword(request.tempPassword())
                 .views(0)
-                .status(Article.ArticleStatus.ACTIVE)
+                .status(ArticleStatus.PENDING)
                 .documentType(documentType)
                 .subjectDomain(subjectDomain)
                 .source(request.source())
@@ -76,6 +73,8 @@ public class ArticleService {
         if (source != null) {
             builder.and(article.source.eq(source));
         }
+
+        builder.and(article.status.eq(ArticleStatus.APPROVED));
 
         List<Article> articles = queryFactory
                 .selectFrom(article)
