@@ -35,6 +35,9 @@ public class FileEntity {
     @Column(name = "file_size")
     private Long fileSize;
 
+    @Column(name = "extension")
+    private String extension;
+
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -43,20 +46,16 @@ public class FileEntity {
     @Column(nullable = false)
     private FileStatus status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "extension_id", nullable = false)
-    private Extension extension;
-
 
     @Builder
-    public FileEntity(Article article, String originalFilename, String storedFilename, String filePath, Long fileSize, Extension extension) {
+    public FileEntity(Article article, String originalFilename, String storedFilename, String filePath, String extension, Long fileSize) {
         this.article = article;
         this.originalFilename = originalFilename;
         this.storedFilename = storedFilename;
         this.filePath = filePath;
         this.fileSize = fileSize;
-        this.status = FileStatus.ACTIVE;
         this.extension = extension;
+        this.status = FileStatus.APPROVED;
     }
 
     // 소프트 삭제 메서드
@@ -66,10 +65,5 @@ public class FileEntity {
 
     public void setArticle(Article article) {
         article = this.article;
-    }
-
-    // 파일 상태를 나타내는 열거형
-    public enum FileStatus {
-        ACTIVE, DELETED
     }
 }

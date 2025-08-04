@@ -11,8 +11,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static re.kr.icuh.icuhplatform.domain.Article.ArticleStatus.ACTIVE;
-
 @Entity
 @Table(name = "articles")
 @Getter
@@ -80,7 +78,7 @@ public class Article {
         this.department = department;
         this.tempPassword = sha256Encode(tempPassword);
         this.views = views == null ? 0 : views;
-        this.status = status == null ? ACTIVE : status;
+        this.status = status == null ? ArticleStatus.PENDING : status;
         this.documentType = documentType;
         this.subjectDomain = subjectDomain;
         this.source = source;
@@ -92,7 +90,7 @@ public class Article {
 
     // 소프트 삭제 메서드
     public void softDelete() {
-        this.status = ArticleStatus.DELETED;
+        this.status = ArticleStatus.DELETED_PENDING;
         this.updatedAt = LocalDateTime.now();
     }
 
@@ -111,10 +109,5 @@ public class Article {
     public boolean validatePassword(String password) {
         // 실제 구현에서는 암호화된 비밀번호 비교 로직 필요
         return this.tempPassword.equals(password);
-    }
-
-    // 게시글 상태를 나타내는 열거형
-    public enum ArticleStatus {
-        ACTIVE, DELETED
     }
 }

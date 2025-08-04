@@ -1,7 +1,6 @@
 package re.kr.icuh.icuhplatform.dto.file;
 
 import re.kr.icuh.icuhplatform.domain.FileEntity;
-import re.kr.icuh.icuhplatform.dto.extension.ExtensionResponse;
 
 import java.time.LocalDateTime;
 
@@ -10,9 +9,8 @@ public record FileResponse(
         String originalFilename,
         String filePath,
         Long fileSize,
-        LocalDateTime createdAt,
-        ExtensionResponse extension,
-        String downloadUrl
+        String extension,
+        LocalDateTime createdAt
 ) {
     public static FileResponse fromEntity(FileEntity file) {
         return new FileResponse(
@@ -20,9 +18,8 @@ public record FileResponse(
                 file.getOriginalFilename(),
                 file.getFilePath(),
                 file.getFileSize(),
-                file.getCreatedAt(),
-                ExtensionResponse.fromEntity(file.getExtension()),
-                "/api/files/" + file.getId() + "/download"
+                file.getExtension(),
+                file.getCreatedAt()
         );
     }
 }
