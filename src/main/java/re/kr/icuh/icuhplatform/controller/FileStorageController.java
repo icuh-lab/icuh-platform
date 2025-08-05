@@ -11,9 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import re.kr.icuh.icuhplatform.dto.article.ArticleListResponse;
-import re.kr.icuh.icuhplatform.dto.article.ArticleResponse;
-import re.kr.icuh.icuhplatform.dto.article.CreateArticleRequest;
+import re.kr.icuh.icuhplatform.dto.article.*;
 import re.kr.icuh.icuhplatform.global.common.ApiResponse;
 import re.kr.icuh.icuhplatform.global.common.SuccessCode;
 import re.kr.icuh.icuhplatform.service.ArticleService;
@@ -51,5 +49,17 @@ public class FileStorageController {
     @GetMapping("/articles/{id}")
     public ResponseEntity<ApiResponse<ArticleResponse>> getArticle(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(articleService.findArticleById(id)));
+    }
+
+    @PostMapping("/articles/{id}")
+    public ResponseEntity<ApiResponse<ArticleResponse>> requestArticleStatueChange(@PathVariable Long id, @RequestBody RequestStatusChange request) {
+        return ResponseEntity.ok(ApiResponse.success(articleService.requestArticleStatueChange(id, request)));
+    }
+
+    @PatchMapping("/articles/{id}")
+    public ResponseEntity<ApiResponse<?>> updateArticle(@PathVariable Long id, @RequestPart @Valid UpdateArticleRequest request, @RequestPart List<MultipartFile> files) throws IOException {
+        articleService.updateArticle(id, request, files);
+
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.ARTICLE_UPDATE_PENDING));
     }
 }
