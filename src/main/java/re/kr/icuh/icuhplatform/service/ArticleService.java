@@ -114,7 +114,7 @@ public class ArticleService {
         Article article = articleRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
 
-        if (article.validatePassword(request.password())) {
+        if (!article.validatePassword(request.password())) {
             throw new BusinessException(ErrorCode.INVALID_PASSWORD);
         }
 
