@@ -1,8 +1,6 @@
 package re.kr.icuh.icuhplatform.service;
 
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,8 +29,21 @@ public class ArticleService {
     private final ArticleStatusHistoryRepository articleStatusHistoryRepository;
     private final DocumentTypeRepository documentTypeRepository;
     private final SubjectDomainRepository subjectDomainRepository;
-    private final JPAQueryFactory queryFactory;
+    private final ArticleQueryRepository articleQueryRepository;
 
+    @Transactional(readOnly = true)
+    public Page<ArticleListResponse> findArticles(String documentType, String  subjectDomain, String source, Pageable pageable) {
+        List<Article> articles = articleQueryRepository.findApprovedArticles(documentType, subjectDomain, source, pageable);
+        JPAQuery<Long> countQuery = articleQueryRepository.countApprovedArticles();
+
+        List<ArticleListResponse> articleListResponses = articles.stream()
+                .map(ArticleListResponse::fromEntity)
+                .collect(Collectors.toList());
+
+        return PageableExecutionUtils.getPage(articleListResponses, pageable, countQuery::fetchOne);
+    }
+
+    @Transactional
     public void createArticle(CreateArticleRequest request, List<MultipartFile> files) {
         validateFiles(files);
         DocumentType documentType = validateDocumentType(request.documentTypeId());
@@ -58,46 +69,7 @@ public class ArticleService {
         fileStorageService.uploadLargeFiles(files, savedArticle);
     }
 
-    public Page<ArticleListResponse> findArticles(String documentType, String  subjectDomain, String source, Pageable pageable) {
-        QArticle article = QArticle.article;
-        BooleanBuilder builder = new BooleanBuilder();
-
-        if (documentType != null) {
-            builder.and(article.documentType.enName.eq(documentType));
-        }
-
-        if (subjectDomain != null) {
-            builder.and(article.subjectDomain.enName.eq(subjectDomain));
-        }
-
-        if (source != null) {
-            builder.and(article.source.eq(source));
-        }
-
-        builder.and(article.status.eq(ArticleStatus.APPROVED));
-
-        List<Article> articles = queryFactory
-                .selectFrom(article)
-                .leftJoin(article.documentType).fetchJoin()
-                .leftJoin(article.subjectDomain).fetchJoin()
-                .where(builder)
-                .orderBy(article.createdAt.desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        JPAQuery<Long> countQuery = queryFactory
-                .select(article.count())
-                .from(article);
-
-        List<ArticleListResponse> articleListResponses = articles.stream()
-                .map(ArticleListResponse::fromEntity)
-                .collect(Collectors.toList());
-
-        return PageableExecutionUtils.getPage(articleListResponses, pageable, countQuery::fetchOne);
-    }
-
-    @Transactional
+    @Transactional(readOnly = true)
     public ArticleResponse findArticleById(Long id) {
         if (!articleRepository.findById(id).isPresent()) {
             throw new BusinessException(ErrorCode.ARTICLE_NOT_FOUND);
