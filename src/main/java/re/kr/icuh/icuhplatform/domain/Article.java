@@ -108,6 +108,6 @@ public class Article {
     // 비밀번호 검증 메서드
     public boolean validatePassword(String password) {
         // 실제 구현에서는 암호화된 비밀번호 비교 로직 필요
-        return this.tempPassword.equals(password);
+        return this.tempPassword.equals(sha256Encode(password));
     }
 }

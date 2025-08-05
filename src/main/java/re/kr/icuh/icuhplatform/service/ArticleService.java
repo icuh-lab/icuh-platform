@@ -165,6 +165,26 @@ public class ArticleService {
 
     }
 
+    @Transactional
+    public void requestArticleDelete(Long id, RequestStatusChange request) {
+        Article article = articleRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
+
+        if (!article.validatePassword(request.password())) {
+            throw new BusinessException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        ArticleStatusHistory articleStatusHistory = ArticleStatusHistory.builder()
+                .article(article)
+                .status(ArticleStatus.DELETED_PENDING)
+                .note(request.reason())
+                .changedBy(article.getAuthor())
+                .changedAt(LocalDateTime.now())
+                .build();
+
+        articleStatusHistoryRepository.save(articleStatusHistory);
+    }
+
 
     private void validateFiles(List<MultipartFile> files) {
         files.forEach(file -> {

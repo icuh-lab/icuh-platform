@@ -62,4 +62,11 @@ public class FileStorageController {
 
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.ARTICLE_UPDATE_PENDING));
     }
+
+    @DeleteMapping("/articles/{id}")
+    public ResponseEntity<ApiResponse<?>> requestArticleDelete(@PathVariable Long id, @RequestBody RequestStatusChange request) {
+        articleService.requestArticleDelete(id, request);
+
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.ARTICLE_DELETE_PENDING));
+    }
 }
