@@ -3,6 +3,7 @@ package re.kr.icuh.icuhplatform.service;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,15 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import re.kr.icuh.icuhplatform.domain.*;
-import re.kr.icuh.icuhplatform.dto.article.ArticleListResponse;
-import re.kr.icuh.icuhplatform.dto.article.ArticleResponse;
-import re.kr.icuh.icuhplatform.dto.article.CreateArticleRequest;
+import re.kr.icuh.icuhplatform.dto.article.*;
 import re.kr.icuh.icuhplatform.global.exception.BusinessException;
 import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
-import re.kr.icuh.icuhplatform.repository.ArticleRepository;
-import re.kr.icuh.icuhplatform.repository.DocumentTypeRepository;
-import re.kr.icuh.icuhplatform.repository.SubjectDomainRepository;
+import re.kr.icuh.icuhplatform.repository.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +27,8 @@ public class ArticleService {
 
     private final FileStorageService fileStorageService;
     private final ArticleRepository articleRepository;
+    private final ArticleEditRequestRepository articleEditRequestRepository;
+    private final ArticleStatusHistoryRepository articleStatusHistoryRepository;
     private final DocumentTypeRepository documentTypeRepository;
     private final SubjectDomainRepository subjectDomainRepository;
     private final JPAQueryFactory queryFactory;
@@ -107,6 +107,62 @@ public class ArticleService {
         article.increaseViews();
 
         return ArticleResponse.fromEntity(article);
+    }
+
+    @Transactional
+    public ArticleResponse requestArticleStatueChange(Long id, RequestStatusChange request) {
+        Article article = articleRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
+
+        if (article.validatePassword(request.password())) {
+            throw new BusinessException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        ArticleStatusHistory articleStatusHistory = ArticleStatusHistory.builder()
+                .article(article)
+                .status(article.getStatus())
+                .note(request.reason())
+                .changedBy(article.getAuthor())
+                .changedAt(LocalDateTime.now())
+                .build();
+
+        articleStatusHistoryRepository.save(articleStatusHistory);
+
+        return ArticleResponse.fromEntity(article);
+    }
+
+    @Transactional
+    public void updateArticle(Long id, @Valid UpdateArticleRequest request, List<MultipartFile> files) {
+        validateFiles(files);
+        DocumentType documentType = validateDocumentType(request.documentTypeId());
+        SubjectDomain subjectDomain = validateSubjectDomain(request.subjectDomainId());
+
+        // 기존에 작성되어 있던 내용은 그대로 가져오고, 새로 작성되는 내용만 덮어쓴다. 패스워드는 그전에 사용했던 값을 그대로 사용
+        Article article = articleRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
+
+        // article_edit_request에 새 row 생성 (status='updated_pending')
+        ArticleEditRequest articleEditRequest = ArticleEditRequest.builder()
+                .title(request.title())
+                .article(article)
+                .description(request.description())
+                .author(request.author())
+                .authorOrganization(request.authorOrganization())
+                .department(request.department())
+                .tempPassword(request.tempPassword())
+                .views(0)
+                .status(ArticleStatus.UPDATED_PENDING)
+                .documentType(documentType)
+                .subjectDomain(subjectDomain)
+                .source(request.source())
+                .build();
+
+
+        ArticleEditRequest updatedPendingArticle = articleEditRequestRepository.save(articleEditRequest);
+
+        fileStorageService.updateLargeFiles(files, updatedPendingArticle);
+
+
     }
 
 
