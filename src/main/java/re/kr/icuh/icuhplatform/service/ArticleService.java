@@ -146,6 +146,10 @@ public class ArticleService {
             throw new BusinessException(ErrorCode.INVALID_PASSWORD);
         }
 
+        article.softDelete();
+        article.getFiles().stream()
+                .forEach(file -> file.softDelete());
+
         ArticleStatusHistory articleStatusHistory = ArticleStatusHistory.builder()
                 .article(article)
                 .status(ArticleStatus.DELETED_PENDING)
