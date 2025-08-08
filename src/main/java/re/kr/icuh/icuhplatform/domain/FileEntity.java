@@ -60,7 +60,7 @@ public class FileEntity {
 
     // 소프트 삭제 메서드
     public void softDelete() {
-        this.status = FileStatus.DELETED;
+        this.status = FileStatus.DELETED_PENDING;
     }
 
     public void setArticle(Article article) {
