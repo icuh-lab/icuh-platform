@@ -69,7 +69,7 @@ public class ArticleService {
         fileStorageService.uploadLargeFiles(files, savedArticle);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public ArticleResponse findArticleById(Long id) {
         if (!articleRepository.findById(id).isPresent()) {
             throw new BusinessException(ErrorCode.ARTICLE_NOT_FOUND);
