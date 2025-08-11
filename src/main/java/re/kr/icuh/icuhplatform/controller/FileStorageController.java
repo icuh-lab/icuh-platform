@@ -52,8 +52,8 @@ public class FileStorageController {
     }
 
     @PostMapping("/articles/{id}")
-    public ResponseEntity<ApiResponse<ArticleResponse>> requestArticleStatueChange(@PathVariable Long id, @RequestBody RequestStatusChange request) {
-        return ResponseEntity.ok(ApiResponse.success(articleService.requestArticleStatueChange(id, request)));
+    public ResponseEntity<ApiResponse<ArticleResponse>> requestArticleUpdate(@PathVariable Long id, @RequestBody RequestStatusChange request) {
+        return ResponseEntity.ok(ApiResponse.success(articleService.requestArticleUpdate(id, request)));
     }
 
     @PatchMapping("/articles/{id}")
