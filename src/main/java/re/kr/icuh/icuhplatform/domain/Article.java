@@ -99,6 +99,11 @@ public class Article {
         this.views++;
     }
 
+    // 상태변경
+    public void changeStatus(ArticleStatus status) {
+        this.status = status;
+    }
+
     // 파일 추가 메서드
     public void addFile(FileEntity file) {
         this.files.add(file);

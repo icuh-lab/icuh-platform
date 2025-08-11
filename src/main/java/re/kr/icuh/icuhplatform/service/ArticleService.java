@@ -82,9 +82,11 @@ public class ArticleService {
     }
 
     @Transactional
-    public ArticleResponse requestArticleStatueChange(Long id, RequestStatusChange request) {
+    public ArticleResponse requestArticleUpdate(Long id, RequestStatusChange request) {
         Article article = articleRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
+
+        article.changeStatus(ArticleStatus.UPDATED_PENDING);
 
         if (!article.validatePassword(request.password())) {
             throw new BusinessException(ErrorCode.INVALID_PASSWORD);
@@ -92,7 +94,7 @@ public class ArticleService {
 
         ArticleStatusHistory articleStatusHistory = ArticleStatusHistory.builder()
                 .article(article)
-                .status(article.getStatus())
+                .status(ArticleStatus.UPDATED_PENDING)
                 .note(request.reason())
                 .changedBy(article.getAuthor())
                 .changedAt(LocalDateTime.now())
