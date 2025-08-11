@@ -1,9 +1,9 @@
 package re.kr.icuh.icuhplatform.dto.article;
 
 import re.kr.icuh.icuhplatform.domain.Article;
+import re.kr.icuh.icuhplatform.domain.FileEntity;
 import re.kr.icuh.icuhplatform.domain.FileStatus;
 import re.kr.icuh.icuhplatform.dto.documenttype.DocumentTypeResponse;
-import re.kr.icuh.icuhplatform.dto.file.FileResponse;
 import re.kr.icuh.icuhplatform.dto.subjectdomain.SubjectDomainResponse;
 
 import java.time.LocalDateTime;
@@ -22,7 +22,7 @@ public record ArticleResponse(
         Integer views,
         DocumentTypeResponse classification,
         SubjectDomainResponse serviceType,
-        List<FileResponse> files
+        List<FileResponseWithDownloadInfo> files
 ) {
     public static ArticleResponse fromEntity(Article article) {
         return new ArticleResponse(
@@ -39,8 +39,30 @@ public record ArticleResponse(
                 SubjectDomainResponse.fromEntity(article.getSubjectDomain()),
                 article.getFiles().stream()
                         .filter(file -> file.getStatus() == FileStatus.APPROVED)
-                        .map(FileResponse::fromEntity)
+                        .map(FileResponseWithDownloadInfo::fromEntity)
                         .collect(Collectors.toList())
         );
     }
 }
+
+// 파일 다운로드 정보가 포함된 FileResponse 클래스
+record FileResponseWithDownloadInfo(
+        Long id,
+        String originalFilename,
+        String extension,
+        Long fileSize,
+        String filePath,
+        String downloadUrl
+) {
+    public static FileResponseWithDownloadInfo fromEntity(FileEntity file) {
+        return new FileResponseWithDownloadInfo(
+                file.getId(),
+                file.getOriginalFilename(),
+                file.getExtension(),
+                file.getFileSize(),
+                file.getFilePath(),
+                "/api/v1/files/" + file.getId() + "/download"
+        );
+    }
+}
+
