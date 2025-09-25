@@ -20,7 +20,7 @@ public class ArticleQueryRepository {
         this.queryFactory = queryFactory;
     }
 
-    public List<Article> findApprovedArticles(String documentType, String  subjectDomain, String source, Pageable pageable) {
+    public List<Article> findApprovedArticles(String documentType, String  subjectDomain, String source, String query, Pageable pageable) {
         QArticle article = QArticle.article;
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -36,7 +36,15 @@ public class ArticleQueryRepository {
             builder.and(article.source.eq(source));
         }
 
-        builder.and(article.status.eq(ArticleStatus.APPROVED));
+        if (query != null) {
+            builder.and(article.title.containsIgnoreCase(query));
+        }
+
+        // 승인 상태 조건을 묶어서 처리
+        builder.andAnyOf(
+                article.status.eq(ArticleStatus.APPROVED),
+                article.status.eq(ArticleStatus.UPDATED_APPROVED)
+        );
 
         return queryFactory
                 .selectFrom(article)
@@ -51,11 +59,15 @@ public class ArticleQueryRepository {
 
     public JPAQuery<Long> countApprovedArticles() {
         QArticle article = QArticle.article;
+        BooleanBuilder builder = new BooleanBuilder();
+
+        builder.or(article.status.eq(ArticleStatus.APPROVED));
+        builder.or(article.status.eq(ArticleStatus.UPDATED_APPROVED));
 
         return queryFactory
                 .select(article.count())
                 .from(article)
-                .where(article.status.eq(ArticleStatus.APPROVED));
+                .where(builder);
     }
 
 }

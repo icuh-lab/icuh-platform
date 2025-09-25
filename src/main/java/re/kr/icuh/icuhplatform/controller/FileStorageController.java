@@ -41,9 +41,10 @@ public class FileStorageController {
     public ResponseEntity<ApiResponse<Page<ArticleListResponse>>> findArticles(@RequestParam(required = false) String documentType,
                                                                                @RequestParam(required = false) String subjectDomain,
                                                                                @RequestParam(required = false) String source,
+                                                                               @RequestParam(required = false) String query,
                                                                                @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        return ResponseEntity.ok(ApiResponse.success(articleService.findArticles(documentType, subjectDomain, source, pageable)));
+        return ResponseEntity.ok(ApiResponse.success(articleService.findArticles(documentType, subjectDomain, source, query, pageable)));
     }
 
     @GetMapping("/articles/{id}")

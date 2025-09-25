@@ -32,8 +32,8 @@ public class ArticleService {
     private final ArticleQueryRepository articleQueryRepository;
 
     @Transactional(readOnly = true)
-    public Page<ArticleListResponse> findArticles(String documentType, String  subjectDomain, String source, Pageable pageable) {
-        List<Article> articles = articleQueryRepository.findApprovedArticles(documentType, subjectDomain, source, pageable);
+    public Page<ArticleListResponse> findArticles(String documentType, String  subjectDomain, String source, String query, Pageable pageable) {
+        List<Article> articles = articleQueryRepository.findApprovedArticles(documentType, subjectDomain, source, query, pageable);
         JPAQuery<Long> countQuery = articleQueryRepository.countApprovedArticles();
 
         List<ArticleListResponse> articleListResponses = articles.stream()

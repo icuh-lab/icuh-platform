@@ -6,5 +6,6 @@ public enum ArticleStatus {
     REJECTED,
     DELETED,
     UPDATED_PENDING,
+    UPDATED_APPROVED,
     DELETED_PENDING
 }
