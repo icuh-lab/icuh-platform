@@ -1,7 +1,6 @@
 package re.kr.icuh.icuhplatform.dto.article;
 
 import re.kr.icuh.icuhplatform.domain.Article;
-import re.kr.icuh.icuhplatform.domain.FileStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,7 +25,6 @@ public record ArticleListResponse(
                 article.getUpdatedAt(),
                 article.getViews(),
                 article.getFiles().stream()
-                        .filter(file -> file.getStatus() == FileStatus.APPROVED)
                         .map(file -> file.getExtension())
                         .collect(Collectors.toList()),
                 article.getDocumentType().getEnName(),

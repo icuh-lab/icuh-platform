@@ -2,7 +2,6 @@ package re.kr.icuh.icuhplatform.dto.article;
 
 import re.kr.icuh.icuhplatform.domain.Article;
 import re.kr.icuh.icuhplatform.domain.FileEntity;
-import re.kr.icuh.icuhplatform.domain.FileStatus;
 import re.kr.icuh.icuhplatform.dto.documenttype.DocumentTypeResponse;
 import re.kr.icuh.icuhplatform.dto.subjectdomain.SubjectDomainResponse;
 
@@ -38,7 +37,6 @@ public record ArticleResponse(
                 DocumentTypeResponse.fromEntity(article.getDocumentType()),
                 SubjectDomainResponse.fromEntity(article.getSubjectDomain()),
                 article.getFiles().stream()
-                        .filter(file -> file.getStatus() == FileStatus.APPROVED)
                         .map(FileResponseWithDownloadInfo::fromEntity)
                         .collect(Collectors.toList())
         );
