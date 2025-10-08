@@ -23,7 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
-public class FileStorageController {
+public class ArticleController {
 
     private final ArticleService articleService;
 
