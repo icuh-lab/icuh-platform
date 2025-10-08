@@ -13,7 +13,7 @@ COPY ./src /workspace/app/src/
 
 # 빌드 실행
 RUN /workspace/app/gradlew build -x test
-RUN mv /workspace/app/build/libs/icuh-platform-0.0.1-SNAPSHOT.jar /workspace/app/app.jar
+RUN mv /workspace/app/build/libs/icuh-platform-0.0.1-SNAPSHOT.jar /workspace/app/icuh-platform.jar
 
 
 # 두번째 스테이지 시작
@@ -23,7 +23,7 @@ FROM eclipse-temurin:17-jre AS runner
 WORKDIR /workspace/app
 
 # 이전 스테이지에서 jar 파일 복사
-COPY --from=builder /workspace/app/app.jar /workspace/app/app.jar
+COPY --from=builder /workspace/app/app.jar /workspace/app/icuh-platform.jar
 
 # 컨테이너 실행시에 app.jar 실행
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "icuh-platform.jar"]
