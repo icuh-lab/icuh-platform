@@ -1,5 +1,5 @@
 # 1. 워크플로우 이름 지정
-name: icuh-platform CI flow
+name: icuh-platform CI/CD flow
 
 # 2. 워크플로우가 시작될 조건 지정
 on:
@@ -77,6 +77,10 @@ jobs:
       run: aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
     - name: Deploy to EC2
+      env: # Deploy 단계에서 사용할 Secret들을 env 블록으로 명시해주는 것이 더 깔끔합니다.
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
       run: |  
         ssh -i "icuh-platform-key.pem" -o StrictHostKeyChecking=no ${{secrets.SSH_EC2_USER}}@${{secrets.SSH_EC2_HOST}} << EOF
           docker login -u ${{ secrets.DOCKER_HUB_ID }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
