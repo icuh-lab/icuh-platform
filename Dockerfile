@@ -23,7 +23,7 @@ FROM eclipse-temurin:17-jre AS runner
 WORKDIR /workspace/app
 
 # 이전 스테이지에서 jar 파일 복사
-COPY --from=builder /workspace/app/app.jar /workspace/app/icuh-platform.jar
+COPY --from=builder /workspace/app/icuh-platform.jar /workspace/app/icuh-platform.jar
 
 # 컨테이너 실행시에 app.jar 실행
 ENTRYPOINT ["java", "-jar", "icuh-platform.jar"]
