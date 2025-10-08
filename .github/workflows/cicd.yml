@@ -91,6 +91,7 @@ jobs:
             -e SPRING_CLOUD_AWS_S3_BUCKET=${S3_BUCKET_NAME} \
             -e SPRING_CLOUD_AWS_CREDENTIALS_ACCESS-KEY=${AWS_ACCESS_KEY_ID} \
             -e SPRING_CLOUD_AWS_CREDENTIALS_SECRET-KEY=${AWS_SECRET_ACCESS_KEY} \
+            -e SPRING_CLOUD_AWS_REGION_STATIC=ap-northeast-2 \
             ${{ secrets.DOCKER_HUB_ID }}/${{ secrets.DOCKER_HUB_REPO }}:latest
         EOF
 
