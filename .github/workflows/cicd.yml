@@ -81,8 +81,6 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
-
-        # PROD
         PROD_DB_URL: ${{ secrets.PROD_DB_URL }}
         PROD_DB_USERNAME: ${{ secrets.PROD_DB_USERNAME }}
         PROD_DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
@@ -95,6 +93,8 @@ jobs:
           docker run -d --name icuh_platform -p 8081:8081 \
             -e SPRING_PROFILES_ACTIVE=prod \
             -e PROD_DB_URL=${PROD_DB_URL} \
+            -e PROD_DB_USERNAME=${PROD_DB_USERNAME} \
+            -e PROD_DB_PASSWORD=${PROD_DB_PASSWORD} \
             -e S3_BUCKET_NAME=${S3_BUCKET_NAME} \
             -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
             -e AWS_SECRET_ACCESS_KEY_ID=${AWS_SECRET_ACCESS_KEY} \
