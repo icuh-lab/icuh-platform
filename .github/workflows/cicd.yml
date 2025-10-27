@@ -96,6 +96,8 @@ jobs:
             -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
             -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
             -e PROD_DB_URL=${PROD_DB_URL} \
+            -e PROD_DB_USERNAME=${PROD_DB_USERNAME} \
+            -e PROD_DB_PASSWORD=${PROD_DB_PASSWORD} \
             ${{ secrets.DOCKER_HUB_ID }}/${{ secrets.DOCKER_HUB_REPO }}:latest
         EOF
 
