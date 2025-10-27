@@ -94,9 +94,6 @@ jobs:
           docker rm icuh_platform
           docker run -d --name icuh_platform -p 8081:8081 \
             -e SPRING_PROFILES_ACTIVE=prod \
-            -e PROD_DB_URL=${PROD_DB_URL} \
-            -e PROD_DB_USERNAME=${PROD_DB_USERNAME} \
-            -e PROD_DB_PASSWORD=${PROD_DB_PASSWORD} \
             -e S3_BUCKET_NAME=${S3_BUCKET_NAME} \
             -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
             -e AWS_SECRET_ACCESS_KEY_ID=${AWS_SECRET_ACCESS_KEY} \
