@@ -81,6 +81,11 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+
+        # PROD
+        PROD_DB_URL: ${{ secrets.PROD_DB_URL }}
+        PROD_DB_USERNAME: ${{ secrets.PROD_DB_USERNAME }}
+        PROD_DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
       run: |  
         ssh -i "icuh-platform-key.pem" -o StrictHostKeyChecking=no ${{secrets.SSH_EC2_USER}}@${{secrets.SSH_EC2_HOST}} << EOF
           docker login -u ${{ secrets.DOCKER_HUB_ID }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
@@ -88,6 +93,10 @@ jobs:
           docker stop icuh_platform
           docker rm icuh_platform
           docker run -d --name icuh_platform -p 8081:8081 \
+            -e SPRING_PROFILES_ACTIVE=prod \
+            -e SPRING_DATASOURCE_URL=${PROD_DB_URL} \
+            -e SPRING_DATASOURCE_USERNAME=${PROD_DB_USERNAME} \
+            -e SPRING_DATASOURCE_PASSWORD=${PROD_DB_PASSWORD} \
             -e SPRING_CLOUD_AWS_S3_BUCKET=${S3_BUCKET_NAME} \
             -e SPRING_CLOUD_AWS_CREDENTIALS_ACCESS-KEY=${AWS_ACCESS_KEY_ID} \
             -e SPRING_CLOUD_AWS_CREDENTIALS_SECRET-KEY=${AWS_SECRET_ACCESS_KEY} \
