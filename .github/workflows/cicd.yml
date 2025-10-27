@@ -94,12 +94,12 @@ jobs:
           docker rm icuh_platform
           docker run -d --name icuh_platform -p 8081:8081 \
             -e SPRING_PROFILES_ACTIVE=prod \
-            -e SPRING_DATASOURCE_URL=${PROD_DB_URL} \
-            -e SPRING_DATASOURCE_USERNAME=${PROD_DB_USERNAME} \
-            -e SPRING_DATASOURCE_PASSWORD=${PROD_DB_PASSWORD} \
-            -e SPRING_CLOUD_AWS_S3_BUCKET=${S3_BUCKET_NAME} \
-            -e SPRING_CLOUD_AWS_CREDENTIALS_ACCESS-KEY=${AWS_ACCESS_KEY_ID} \
-            -e SPRING_CLOUD_AWS_CREDENTIALS_SECRET-KEY=${AWS_SECRET_ACCESS_KEY} \
+            -e PROD_DB_URL=${PROD_DB_URL} \
+            -e PROD_DB_USERNAME=${PROD_DB_USERNAME} \
+            -e PROD_DB_PASSWORD=${PROD_DB_PASSWORD} \
+            -e S3_BUCKET_NAME=${S3_BUCKET_NAME} \
+            -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+            -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
             -e SPRING_CLOUD_AWS_REGION_STATIC=ap-northeast-2 \
             ${{ secrets.DOCKER_HUB_ID }}/${{ secrets.DOCKER_HUB_REPO }}:latest
         EOF
