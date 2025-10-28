@@ -90,7 +90,7 @@ jobs:
           docker pull ${{ secrets.DOCKER_HUB_ID }}/${{ secrets.DOCKER_HUB_REPO }}:latest
           docker stop icuh_platform
           docker rm icuh_platform
-          docker run -d --name icuh_platform -p 8081:8081 -e SPRING_PROFILES_ACTIVE='prod' -e SPRING_CLOUD_AWS_S3_BUCKET='${{ secrets.S3_BUCKET_NAME }}' -e SPRING_CLOUD_AWS_CREDENTIALS_ACCESS-KEY='${{ secrets.AWS_ACCESS_KEY_ID }}' -e SPRING_CLOUD_AWS_CREDENTIALS_SECRET-KEY='${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e SPRING_DATASOURCE_URL='${{ secrets.PROD_DB_URL }}' -e SPRING_DATASOURCE_USERNAME='${{ secrets.PROD_DB_USERNAME }}' -e SPRING_DATASOURCE_PASSWORD='${{ secrets.PROD_DB_PASSWORD }}' ${{ secrets.DOCKER_HUB_ID }}/${{ secrets.DOCKER_HUB_REPO }}:latest
+          docker run -d --name icuh_platform -p 8081:8081 -e SPRING_PROFILES_ACTIVE='prod' -e SPRING_CLOUD_AWS_S3_BUCKET='${{ secrets.S3_BUCKET_NAME }}' -e SPRING_CLOUD_AWS_S3_REGION_STATIC='ap-northest-2' -e SPRING_CLOUD_AWS_CREDENTIALS_ACCESS-KEY='${{ secrets.AWS_ACCESS_KEY_ID }}' -e SPRING_CLOUD_AWS_CREDENTIALS_SECRET-KEY='${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e SPRING_DATASOURCE_URL='${{ secrets.PROD_DB_URL }}' -e SPRING_DATASOURCE_USERNAME='${{ secrets.PROD_DB_USERNAME }}' -e SPRING_DATASOURCE_PASSWORD='${{ secrets.PROD_DB_PASSWORD }}' ${{ secrets.DOCKER_HUB_ID }}/${{ secrets.DOCKER_HUB_REPO }}:latest
         EOF
 
     - name: Remove Github Actions IP From Security Group
