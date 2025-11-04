@@ -44,6 +44,7 @@ public class FileUtils {
      * MultipartFile을 임시 File로 변환합니다.
      */
     public File convertToTempFile(MultipartFile file) throws IOException {
+        log.info("convertToTempFile - file: {}", file.getOriginalFilename());
         File tempFile = File.createTempFile("temp_", file.getOriginalFilename());
         file.transferTo(tempFile);
         return tempFile;
