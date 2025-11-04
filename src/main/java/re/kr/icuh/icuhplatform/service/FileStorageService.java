@@ -33,6 +33,7 @@ public class FileStorageService {
 
     private void uploadLargeFile(MultipartFile multipartFile, Article article) {
         File tempFile = null;
+        log.info("uploadLargeFile - multipartFile: {}", multipartFile.getOriginalFilename());
 
         try {
             FileMetadata metadata = fileUtils.createFileMetadata(multipartFile);
