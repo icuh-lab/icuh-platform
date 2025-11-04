@@ -1,5 +1,6 @@
 package re.kr.icuh.icuhplatform.global.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import re.kr.icuh.icuhplatform.domain.FileMetadata;
@@ -8,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
+@Slf4j
 @Component
 public class FileUtils {
 
@@ -51,6 +53,9 @@ public class FileUtils {
      * 임시 파일을 삭제합니다.
      */
     public boolean deleteTempFile(File file) {
+        if (file == null) {
+            log.info("file is null");
+        }
         return file.delete();
     }
 

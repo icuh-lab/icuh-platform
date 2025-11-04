@@ -39,6 +39,8 @@ public class FileStorageService {
             FileMetadata metadata = fileUtils.createFileMetadata(multipartFile);
             tempFile = fileUtils.convertToTempFile(multipartFile);
 
+            log.info("uploadLargeFile - tempFile: {}", tempFile.getAbsoluteFile());
+
             String fileUrl = s3FileUploader.uploadFile(tempFile, metadata.getSavedName());
             saveFileMetadataToFileEntity(article, metadata, fileUrl);
         } catch (Exception e) {
