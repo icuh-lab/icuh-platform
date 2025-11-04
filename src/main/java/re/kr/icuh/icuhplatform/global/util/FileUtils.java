@@ -46,7 +46,9 @@ public class FileUtils {
     public File convertToTempFile(MultipartFile file) throws IOException {
         log.info("convertToTempFile - file: {}", file.getOriginalFilename());
         File tempFile = File.createTempFile("temp_", file.getOriginalFilename());
+        log.info("convertToTempFile - tempFile: {}", tempFile.getAbsoluteFile());
         file.transferTo(tempFile);
+        log.info("convertToTempFile - tempFile size: {}", tempFile.length());
         return tempFile;
     }
 
