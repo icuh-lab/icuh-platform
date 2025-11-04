@@ -45,8 +45,16 @@ public class FileUtils {
      */
     public File convertToTempFile(MultipartFile file) throws IOException {
         log.info("convertToTempFile - file: {}", file.getOriginalFilename());
-        File tempFile = File.createTempFile("temp_", file.getOriginalFilename());
-        log.info("convertToTempFile - tempFile: {}", tempFile.getAbsoluteFile());
+
+        // 원본 파일의 확장자 추출
+        String extension = extractExtensionName(file.getOriginalFilename());
+        // 확장자가 없으면 .tmp 사용
+        String suffix = (extension == null || extension.isEmpty()) ? ".tmp" : "." + extension;
+
+        // 안전한 이름(UUID)으로 임시 파일 생성
+        File tempFile = File.createTempFile(UUID.randomUUID().toString() + "_", suffix);
+
+        log.info("convertToTempFile - created tempFile: {}", tempFile.getAbsoluteFile());
         file.transferTo(tempFile);
         log.info("convertToTempFile - tempFile size: {}", tempFile.length());
         return tempFile;
