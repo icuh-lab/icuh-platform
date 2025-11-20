@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import re.kr.icuh.icuhplatform.domain.*;
 import re.kr.icuh.icuhplatform.dto.article.*;
 import re.kr.icuh.icuhplatform.global.exception.BusinessException;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ArticleService {
 
-    private final FileStorageService fileStorageService;
     private final ArticleRepository articleRepository;
     private final ArticleEditRequestRepository articleEditRequestRepository;
     private final ArticleStatusHistoryRepository articleStatusHistoryRepository;
@@ -105,8 +103,7 @@ public class ArticleService {
     }
 
     @Transactional
-    public void updateArticle(Long id, @Valid UpdateArticleRequest request, List<MultipartFile> files) {
-        validateFiles(files);
+    public Long updateArticle(Long id, @Valid UpdateArticleRequest request) {
         DocumentType documentType = validateDocumentType(request.documentTypeId());
         SubjectDomain subjectDomain = validateSubjectDomain(request.subjectDomainId());
 
@@ -131,10 +128,9 @@ public class ArticleService {
                 .build();
 
 
-        ArticleEditRequest updatedPendingArticle = articleEditRequestRepository.save(articleEditRequest);
+        ArticleEditRequest updatedPendingArticleId = articleEditRequestRepository.save(articleEditRequest);
 
-        fileStorageService.updateLargeFiles(files, updatedPendingArticle);
-
+        return updatedPendingArticleId.getId();
 
     }
 
@@ -160,20 +156,6 @@ public class ArticleService {
                 .build();
 
         articleStatusHistoryRepository.save(articleStatusHistory);
-    }
-
-
-    private void validateFiles(List<MultipartFile> files) {
-        files.forEach(file -> {
-            if (file == null || file.isEmpty()) {
-                throw new BusinessException(ErrorCode.FILE_NOT_FOUND);
-            }
-
-            String fileName = file.getOriginalFilename();
-            if (fileName != null && (fileName.endsWith(".exe") || fileName.endsWith(".dmg"))) {
-                throw new BusinessException(ErrorCode.UNSUPPORTED_FILE_TYPE);
-            }
-        });
     }
 
     private DocumentType validateDocumentType(Long documentTypeId) {
