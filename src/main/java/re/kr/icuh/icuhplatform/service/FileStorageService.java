@@ -112,11 +112,20 @@ public class FileStorageService {
     }
 
     @Transactional
-    public void createFileMetaData(CompleteUploadRequestDto request) {
+    public void createFileMetaData(CompleteUploadRequestDto request, String location) {
         // Optional의 값이 없다면 empty를 반환
         Article savedArticle = articleRepository.findById(request.getArticleId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
 
+        FileEntity fileEntity = FileEntity.builder()
+                .article(savedArticle)
+                .originalFilename(request.getOriginFileName())
+                .storedFilename(request.getFileName())
+                .filePath(location)
+                .fileSize(request.getFileSize())
+                .extension(fileUtils.extractExtensionName(request.getOriginFileName()))
+                .build();
 
+        fileRepository.save(fileEntity);
     }
 }

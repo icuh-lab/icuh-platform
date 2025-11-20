@@ -12,4 +12,6 @@ public class CompleteUploadRequestDto {
     private String fileName;
     private List<PartETagDto> parts;
     private Long articleId;
+    private Long fileSize;
+    private String originFileName;
 }

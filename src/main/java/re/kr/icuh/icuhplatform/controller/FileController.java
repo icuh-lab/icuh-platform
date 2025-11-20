@@ -18,7 +18,9 @@ import re.kr.icuh.icuhplatform.dto.file.InitiateUploadResponseDto;
 import re.kr.icuh.icuhplatform.dto.file.PresignedUrlRequestDto;
 import re.kr.icuh.icuhplatform.global.exception.BusinessException;
 import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
+import re.kr.icuh.icuhplatform.global.util.FileUtils;
 import re.kr.icuh.icuhplatform.repository.FileRepository;
+import re.kr.icuh.icuhplatform.service.FileStorageService;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -37,13 +39,18 @@ public class FileController {
 
     private final AmazonS3Client amazonS3Client;
     private final FileRepository fileRepository;
+    private final FileStorageService fileStorageService;
 
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucketName;
 
     @PostMapping("/generate-upload-id")
     public ResponseEntity<InitiateUploadResponseDto> generateUploadId(@RequestBody InitiateUploadRequestDto request) {
-        String s3Key = "upload/" + request.getFileName();
+        // NOTE: 원본 파일명, 디비에 저장될 파일명, 파일 사이즈를 기반으로 파일 메타데이터 생성
+        FileUtils fileUtils = new FileUtils();
+        String storedFileName = fileUtils.createStoreFileName(request.getFileName());
+
+        String s3Key = "upload/" + storedFileName;
 
         InitiateMultipartUploadResult initiateUpload = amazonS3Client.initiateMultipartUpload(new InitiateMultipartUploadRequest(bucketName, s3Key));
         String uploadId = initiateUpload.getUploadId();
@@ -86,8 +93,10 @@ public class FileController {
                 partETags
         );
 
-        amazonS3Client.completeMultipartUpload(completeMultipartUploadRequest);
+        CompleteMultipartUploadResult completeMultipartUploadResult = amazonS3Client.completeMultipartUpload(completeMultipartUploadRequest);
         log.info("Upload complete for {}", request.getFileName());
+
+        fileStorageService.createFileMetaData(request, completeMultipartUploadResult.getLocation());
 
         return ResponseEntity.ok().build();
     }
