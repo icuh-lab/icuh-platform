@@ -3,11 +3,14 @@ package re.kr.icuh.icuhplatform.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import re.kr.icuh.icuhplatform.domain.*;
+import re.kr.icuh.icuhplatform.dto.file.CompleteUploadRequestDto;
 import re.kr.icuh.icuhplatform.global.exception.BusinessException;
 import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
 import re.kr.icuh.icuhplatform.global.util.FileUtils;
+import re.kr.icuh.icuhplatform.repository.ArticleRepository;
 import re.kr.icuh.icuhplatform.repository.FileEditRequestRepository;
 import re.kr.icuh.icuhplatform.repository.FileRepository;
 
@@ -23,6 +26,7 @@ public class FileStorageService {
     private final S3FileUploader s3FileUploader;
     private final FileRepository fileRepository;
     private final FileEditRequestRepository fileEditRequestRepository;
+    private final ArticleRepository articleRepository;
 
 
     public void uploadLargeFiles(List<MultipartFile> files, Article article) {
@@ -107,6 +111,12 @@ public class FileStorageService {
 
     }
 
+    @Transactional
+    public void createFileMetaData(CompleteUploadRequestDto request) {
+        // Optional의 값이 없다면 empty를 반환
+        Article savedArticle = articleRepository.findById(request.getArticleId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
 
 
+    }
 }

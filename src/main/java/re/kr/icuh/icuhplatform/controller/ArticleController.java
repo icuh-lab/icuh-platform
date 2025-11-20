@@ -29,12 +29,8 @@ public class ArticleController {
 
     @PostMapping("/articles")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public ResponseEntity<ApiResponse<?>> createArticle(@RequestPart @Valid CreateArticleRequest request,
-                                                @RequestPart List<MultipartFile> files) throws IOException {
-
-        articleService.createArticle(request, files);
-
-        return ResponseEntity.ok(ApiResponse.created(SuccessCode.ARTICLE_CREATE_SUCCESS));
+    public ResponseEntity<ApiResponse<?>> createArticle(@RequestBody @Valid CreateArticleRequest request) throws IOException {
+        return ResponseEntity.ok(ApiResponse.success(articleService.createArticle(request)));
     }
 
     @GetMapping("/articles")

@@ -44,8 +44,7 @@ public class ArticleService {
     }
 
     @Transactional
-    public void createArticle(CreateArticleRequest request, List<MultipartFile> files) {
-        validateFiles(files);
+    public Long createArticle(CreateArticleRequest request) {
         DocumentType documentType = validateDocumentType(request.documentTypeId());
         SubjectDomain subjectDomain = validateSubjectDomain(request.subjectDomainId());
 
@@ -64,9 +63,9 @@ public class ArticleService {
                 .source(request.source())
                 .build();
 
-        Article savedArticle = articleRepository.save(article);
+        Article savedArticleId = articleRepository.save(article);
 
-        fileStorageService.uploadLargeFiles(files, savedArticle);
+        return savedArticleId.getId();
     }
 
     @Transactional
