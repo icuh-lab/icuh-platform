@@ -10,14 +10,10 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import re.kr.icuh.icuhplatform.dto.article.*;
 import re.kr.icuh.icuhplatform.global.common.ApiResponse;
 import re.kr.icuh.icuhplatform.global.common.SuccessCode;
 import re.kr.icuh.icuhplatform.service.ArticleService;
-
-import java.io.IOException;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -29,7 +25,7 @@ public class ArticleController {
 
     @PostMapping("/articles")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public ResponseEntity<ApiResponse<?>> createArticle(@RequestBody @Valid CreateArticleRequest request) throws IOException {
+    public ResponseEntity<ApiResponse<?>> createArticle(@RequestBody @Valid CreateArticleRequest request) {
         return ResponseEntity.ok(ApiResponse.success(articleService.createArticle(request)));
     }
 
@@ -54,10 +50,8 @@ public class ArticleController {
     }
 
     @PatchMapping("/articles/{id}")
-    public ResponseEntity<ApiResponse<?>> updateArticle(@PathVariable Long id, @RequestPart @Valid UpdateArticleRequest request, @RequestPart List<MultipartFile> files) throws IOException {
-        articleService.updateArticle(id, request, files);
-
-        return ResponseEntity.ok(ApiResponse.success(SuccessCode.ARTICLE_UPDATE_PENDING));
+    public ResponseEntity<ApiResponse<?>> updateArticle(@PathVariable Long id, @RequestBody @Valid UpdateArticleRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(articleService.updateArticle(id, request)));
     }
 
     @DeleteMapping("/articles/{id}")
