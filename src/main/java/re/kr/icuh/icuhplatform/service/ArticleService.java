@@ -59,6 +59,8 @@ public class ArticleService {
                 .documentType(documentType)
                 .subjectDomain(subjectDomain)
                 .source(request.source())
+                .isDeleted(false)
+                .deletedAt(null)
                 .build();
 
         Article savedArticleId = articleRepository.save(article);
