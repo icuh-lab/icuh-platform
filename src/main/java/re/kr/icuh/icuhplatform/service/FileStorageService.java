@@ -10,6 +10,7 @@ import re.kr.icuh.icuhplatform.dto.file.CompleteUploadRequestDto;
 import re.kr.icuh.icuhplatform.global.exception.BusinessException;
 import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
 import re.kr.icuh.icuhplatform.global.util.FileUtils;
+import re.kr.icuh.icuhplatform.repository.ArticleEditRequestRepository;
 import re.kr.icuh.icuhplatform.repository.ArticleRepository;
 import re.kr.icuh.icuhplatform.repository.FileEditRequestRepository;
 import re.kr.icuh.icuhplatform.repository.FileRepository;
@@ -27,6 +28,7 @@ public class FileStorageService {
     private final FileRepository fileRepository;
     private final FileEditRequestRepository fileEditRequestRepository;
     private final ArticleRepository articleRepository;
+    private final ArticleEditRequestRepository articleEditRequestRepository;
 
 
     public void uploadLargeFiles(List<MultipartFile> files, Article article) {
@@ -113,19 +115,37 @@ public class FileStorageService {
 
     @Transactional
     public void createFileMetaData(CompleteUploadRequestDto request, String location) {
-        // Optional의 값이 없다면 empty를 반환
-        Article savedArticle = articleRepository.findById(request.getArticleId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
+        if (request.getFileStatus().equals("update")) {
+            ArticleEditRequest articleEditRequest = articleEditRequestRepository.findById(request.getArticleId())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
 
-        FileEntity fileEntity = FileEntity.builder()
-                .article(savedArticle)
-                .originalFilename(request.getOriginFileName())
-                .storedFilename(request.getFileName())
-                .filePath(location)
-                .fileSize(request.getFileSize())
-                .extension(fileUtils.extractExtensionName(request.getOriginFileName()))
-                .build();
+            FileEditRequest fileEditRequest = FileEditRequest.builder()
+                    .articleEditRequest(articleEditRequest)
+                    .originalFilename(request.getOriginFileName())
+                    .storedFilename(request.getFileName())
+                    .filePath(location)
+                    .fileSize(request.getFileSize())
+                    .extension(fileUtils.extractExtensionName(request.getOriginFileName()))
+                    .build();
 
-        fileRepository.save(fileEntity);
+            fileEditRequestRepository.save(fileEditRequest);
+
+        } else {
+            Article savedArticle = articleRepository.findById(request.getArticleId())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
+
+            FileEntity fileEntity = FileEntity.builder()
+                    .article(savedArticle)
+                    .originalFilename(request.getOriginFileName())
+                    .storedFilename(request.getFileName())
+                    .filePath(location)
+                    .fileSize(request.getFileSize())
+                    .extension(fileUtils.extractExtensionName(request.getOriginFileName()))
+                    .build();
+
+            fileRepository.save(fileEntity);
+        }
+
+
     }
 }

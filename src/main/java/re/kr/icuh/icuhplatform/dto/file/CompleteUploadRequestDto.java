@@ -14,4 +14,5 @@ public class CompleteUploadRequestDto {
     private Long articleId;
     private Long fileSize;
     private String originFileName;
+    private String fileStatus;
 }
