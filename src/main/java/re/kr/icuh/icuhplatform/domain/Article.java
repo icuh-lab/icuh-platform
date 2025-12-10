@@ -5,6 +5,9 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.testcontainers.shaded.com.google.common.hash.Hashing;
+import re.kr.icuh.icuhplatform.dto.NewFileRequestJsonConverter;
+import re.kr.icuh.icuhplatform.dto.UpdateArticleRequestJsonConverter;
+import re.kr.icuh.icuhplatform.dto.article.UpdateArticleRequest;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -72,6 +75,14 @@ public class Article {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    @Column(name = "pending_update")
+    @Convert(converter = UpdateArticleRequestJsonConverter.class)
+    private UpdateArticleRequest pendingUpdate;
+
+    @Column(name = "pending_file_update")
+    @Convert(converter = NewFileRequestJsonConverter.class)
+    private List<UpdateArticleRequest.NewFileRequest> pendingFileUpdate;
+
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FileEntity> files = new ArrayList<>();
 
@@ -90,6 +101,8 @@ public class Article {
         this.source = source;
         this.isDeleted = isDeleted;
         this.deletedAt = deletedAt;
+        this.pendingUpdate = null;
+        this.pendingFileUpdate = null;
     }
 
     public String sha256Encode(String tempPassword) {
@@ -112,15 +125,17 @@ public class Article {
         this.status = status;
     }
 
-    // 파일 추가 메서드
-    public void addFile(FileEntity file) {
-        this.files.add(file);
-        file.setArticle(this);
-    }
-
     // 비밀번호 검증 메서드
     public boolean validatePassword(String password) {
         // 실제 구현에서는 암호화된 비밀번호 비교 로직 필요
         return this.tempPassword.equals(sha256Encode(password));
+    }
+
+    public void setPendingUpdate(UpdateArticleRequest request) {
+        this.pendingUpdate = request;
+    }
+
+    public void setPendingFileUpdate(List<UpdateArticleRequest.NewFileRequest> request) {
+        this.pendingFileUpdate = request;
     }
 }
