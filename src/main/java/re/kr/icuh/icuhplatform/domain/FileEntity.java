@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import re.kr.icuh.icuhplatform.dto.UpdateArticleRequestJsonConverter;
 
 import java.time.LocalDateTime;
 
@@ -46,24 +47,28 @@ public class FileEntity {
     @Column(nullable = false)
     private FileStatus status;
 
+    @Column(name = "pending_update")
+    @Convert(converter = UpdateArticleRequestJsonConverter.class)
+    private FileEditRequest pendingUpdate;
+
 
     @Builder
-    public FileEntity(Article article, String originalFilename, String storedFilename, String filePath, String extension, Long fileSize) {
+    public FileEntity(Article article, String originalFilename, String storedFilename, String filePath, Long fileSize, String extension, FileStatus status) {
         this.article = article;
         this.originalFilename = originalFilename;
         this.storedFilename = storedFilename;
         this.filePath = filePath;
         this.fileSize = fileSize;
         this.extension = extension;
-        this.status = FileStatus.APPROVED;
+        this.status = status;
+        this.pendingUpdate = null;
     }
 
     // 소프트 삭제 메서드
+    // TODO: 파일 자체에서 status를 관리할 필요가 있나..?
     public void softDelete() {
         this.status = FileStatus.DELETED_PENDING;
     }
 
-    public void setArticle(Article article) {
-        article = this.article;
-    }
+
 }

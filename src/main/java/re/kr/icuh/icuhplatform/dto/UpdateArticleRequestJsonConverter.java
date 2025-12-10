@@ -3,25 +3,24 @@ package re.kr.icuh.icuhplatform.dto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import org.springframework.core.GenericTypeResolver;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import re.kr.icuh.icuhplatform.dto.article.UpdateArticleRequest;
 
 @Converter
-public class JsonConverter<T> implements AttributeConverter<T, String> {
+public class UpdateArticleRequestJsonConverter<T> implements AttributeConverter<UpdateArticleRequest, String> {
 
-    protected final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
-    public JsonConverter(ObjectMapper objectMapper) {
+    public UpdateArticleRequestJsonConverter(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public String convertToDatabaseColumn(T entityAttribute) {
+    public String convertToDatabaseColumn(UpdateArticleRequest entityAttribute) {
         if (ObjectUtils.isEmpty(entityAttribute)) {
             return null;
         }
-
         try {
             return objectMapper.writeValueAsString(entityAttribute);
         } catch (Exception e) {
@@ -30,11 +29,10 @@ public class JsonConverter<T> implements AttributeConverter<T, String> {
     }
 
     @Override
-    public T convertToEntityAttribute(String dbData) {
+    public UpdateArticleRequest convertToEntityAttribute(String dbData) {
         if (StringUtils.hasText(dbData)) {
-            Class<?> clazz = GenericTypeResolver.resolveTypeArgument(getClass(), JsonConverter.class);
             try {
-                return (T) objectMapper.readValue(dbData, clazz); // unchecked exception이 발생할 수 있다는건가..
+                return objectMapper.readValue(dbData, UpdateArticleRequest.class);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
