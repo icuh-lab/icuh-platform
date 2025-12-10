@@ -2,6 +2,8 @@ package re.kr.icuh.icuhplatform.dto.article;
 
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
+
 public record UpdateArticleRequest(
         @NotNull String title,
         @NotNull String description,
@@ -11,6 +13,15 @@ public record UpdateArticleRequest(
         @NotNull String tempPassword,
         @NotNull Long documentTypeId,
         @NotNull Long subjectDomainId,
-        @NotNull String source
-) {}
+        @NotNull String source,
+        List<NewFileRequest>newFiles
+) {
+    public record NewFileRequest(
+            String originalFileName,
+            String storedFileName,
+            String filePath,
+            Long fileSize,
+            String extension
+    ) {}
+}
 

@@ -13,10 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import re.kr.icuh.icuhplatform.domain.FileEditRequest;
 import re.kr.icuh.icuhplatform.domain.FileEntity;
-import re.kr.icuh.icuhplatform.dto.file.CompleteUploadRequestDto;
-import re.kr.icuh.icuhplatform.dto.file.InitiateUploadRequestDto;
-import re.kr.icuh.icuhplatform.dto.file.InitiateUploadResponseDto;
-import re.kr.icuh.icuhplatform.dto.file.PresignedUrlRequestDto;
+import re.kr.icuh.icuhplatform.dto.file.*;
 import re.kr.icuh.icuhplatform.global.exception.BusinessException;
 import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
 import re.kr.icuh.icuhplatform.global.util.FileUtils;
@@ -29,6 +26,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,6 +41,8 @@ public class FileController {
     private final FileRepository fileRepository;
     private final FileStorageService fileStorageService;
     private final FileEditRequestRepository fileEditRequestRepository;
+
+    private final List<CompleteUploadRequestDto> list = new ArrayList<>();
 
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucketName;
@@ -102,6 +102,26 @@ public class FileController {
         fileStorageService.createFileMetaData(request, completeMultipartUploadResult.getLocation());
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/update-upload")
+    public ResponseEntity<CompleteUploadResponseDto> updateUpload(@RequestBody CompleteUploadRequestDto request) {
+
+        // 클라이언트가 보낸 etag 리스트를 AWS SDK용 PartETag 리스트로 변환
+        List<PartETag> partETags = request.getParts().stream()
+                .map(part -> new PartETag(part.getPartNumber(), part.getEtag()))
+                .collect(Collectors.toList());
+
+        CompleteMultipartUploadRequest completeMultipartUploadRequest = new CompleteMultipartUploadRequest(
+                bucketName,
+                request.getFileName(),
+                request.getUploadId(),
+                partETags
+        );
+
+        CompleteMultipartUploadResult completeMultipartUploadResult = amazonS3Client.completeMultipartUpload(completeMultipartUploadRequest);
+
+        return ResponseEntity.ok(fileStorageService.updateFileMetaData(request, completeMultipartUploadResult.getLocation()));
     }
 
     @GetMapping("/files/{fileId}/download")

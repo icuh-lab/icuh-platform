@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import re.kr.icuh.icuhplatform.domain.*;
 import re.kr.icuh.icuhplatform.dto.file.CompleteUploadRequestDto;
+import re.kr.icuh.icuhplatform.dto.file.CompleteUploadResponseDto;
 import re.kr.icuh.icuhplatform.global.exception.BusinessException;
 import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
 import re.kr.icuh.icuhplatform.global.util.FileUtils;
@@ -115,37 +116,32 @@ public class FileStorageService {
 
     @Transactional
     public void createFileMetaData(CompleteUploadRequestDto request, String location) {
-        if (request.getFileStatus().equals("update")) {
-            ArticleEditRequest articleEditRequest = articleEditRequestRepository.findById(request.getArticleId())
-                    .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
+        Article savedArticle = articleRepository.findById(request.getArticleId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
 
-            FileEditRequest fileEditRequest = FileEditRequest.builder()
-                    .articleEditRequest(articleEditRequest)
-                    .originalFilename(request.getOriginFileName())
-                    .storedFilename(request.getFileName())
-                    .filePath(location)
-                    .fileSize(request.getFileSize())
-                    .extension(fileUtils.extractExtensionName(request.getOriginFileName()))
-                    .build();
+        FileEntity fileEntity = FileEntity.builder()
+                .article(savedArticle)
+                .originalFilename(request.getOriginFileName())
+                .storedFilename(request.getFileName())
+                .filePath(location)
+                .fileSize(request.getFileSize())
+                .extension(fileUtils.extractExtensionName(request.getOriginFileName()))
+                .status(FileStatus.PENDING)
+                .build();
 
-            fileEditRequestRepository.save(fileEditRequest);
-
-        } else {
-            Article savedArticle = articleRepository.findById(request.getArticleId())
-                    .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
-
-            FileEntity fileEntity = FileEntity.builder()
-                    .article(savedArticle)
-                    .originalFilename(request.getOriginFileName())
-                    .storedFilename(request.getFileName())
-                    .filePath(location)
-                    .fileSize(request.getFileSize())
-                    .extension(fileUtils.extractExtensionName(request.getOriginFileName()))
-                    .build();
-
-            fileRepository.save(fileEntity);
-        }
-
-
+        fileRepository.save(fileEntity);
     }
+
+    @Transactional
+    public CompleteUploadResponseDto updateFileMetaData(CompleteUploadRequestDto request, String location) {
+        // article id로 게시글을 찾고, 해당 게시글의 pending_update 컬럼에 값이 있다면 해당 게시글은 업데이트 대기 중인 상태
+        return CompleteUploadResponseDto.builder()
+                .originalFileName(request.getOriginFileName())
+                .storedFileName(request.getFileName())
+                .filePath(location)
+                .fileSize(request.getFileSize())
+                .extension(fileUtils.extractExtensionName(request.getOriginFileName()))
+                .build();
+    }
+
 }
