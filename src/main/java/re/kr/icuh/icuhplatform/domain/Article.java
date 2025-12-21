@@ -5,7 +5,6 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.testcontainers.shaded.com.google.common.hash.Hashing;
-import re.kr.icuh.icuhplatform.dto.NewFileRequestJsonConverter;
 import re.kr.icuh.icuhplatform.dto.UpdateArticleRequestJsonConverter;
 import re.kr.icuh.icuhplatform.dto.article.UpdateArticleRequest;
 
@@ -79,10 +78,6 @@ public class Article {
     @Convert(converter = UpdateArticleRequestJsonConverter.class)
     private UpdateArticleRequest pendingUpdate;
 
-    @Column(name = "pending_file_update")
-    @Convert(converter = NewFileRequestJsonConverter.class)
-    private List<UpdateArticleRequest.NewFileRequest> pendingFileUpdate;
-
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FileEntity> files = new ArrayList<>();
 
@@ -102,7 +97,6 @@ public class Article {
         this.isDeleted = isDeleted;
         this.deletedAt = deletedAt;
         this.pendingUpdate = null;
-        this.pendingFileUpdate = null;
     }
 
     public String sha256Encode(String tempPassword) {
@@ -128,9 +122,5 @@ public class Article {
 
     public void setPendingUpdate(UpdateArticleRequest request) {
         this.pendingUpdate = request;
-    }
-
-    public void setPendingFileUpdate(List<UpdateArticleRequest.NewFileRequest> request) {
-        this.pendingFileUpdate = request;
     }
 }

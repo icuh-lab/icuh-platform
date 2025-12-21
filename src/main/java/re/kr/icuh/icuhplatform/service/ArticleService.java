@@ -106,7 +106,6 @@ public class ArticleService {
 
         // UpdateArticleRequest 객체를 json 형식으로 컬럼에 집어넣어야함
         savedArticle.setPendingUpdate(request);
-        savedArticle.setPendingFileUpdate(request.newFiles());
 
         return savedArticle.getId();
     }
