@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import re.kr.icuh.icuhplatform.dto.article.*;
@@ -23,12 +22,6 @@ public class ArticleController {
 
     private final ArticleService articleService;
 
-    @PostMapping("/articles")
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public ResponseEntity<ApiResponse<CreateArticleResponse>> createArticle(@RequestBody @Valid CreateArticleRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(articleService.createArticle(request)));
-    }
-
     @GetMapping("/articles")
     public ResponseEntity<ApiResponse<Page<ArticleListResponse>>> findArticles(@RequestParam(required = false) String documentType,
                                                                                @RequestParam(required = false) String subjectDomain,
@@ -42,6 +35,11 @@ public class ArticleController {
     @GetMapping("/articles/{id}")
     public ResponseEntity<ApiResponse<ArticleResponse>> getArticle(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(articleService.findArticleById(id)));
+    }
+
+    @PostMapping("/articles")
+    public ResponseEntity<ApiResponse<CreateArticleResponse>> createArticle(@RequestBody @Valid CreateArticleRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(articleService.createArticle(request)));
     }
 
     @PostMapping("/articles/{id}")
