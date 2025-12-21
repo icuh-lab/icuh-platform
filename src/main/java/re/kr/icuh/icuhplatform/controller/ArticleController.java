@@ -25,7 +25,7 @@ public class ArticleController {
 
     @PostMapping("/articles")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public ResponseEntity<ApiResponse<?>> createArticle(@RequestBody @Valid CreateArticleRequest request) {
+    public ResponseEntity<ApiResponse<CreateArticleResponse>> createArticle(@RequestBody @Valid CreateArticleRequest request) {
         return ResponseEntity.ok(ApiResponse.success(articleService.createArticle(request)));
     }
 

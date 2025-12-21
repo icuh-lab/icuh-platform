@@ -45,7 +45,7 @@ public class ArticleService {
     }
 
     @Transactional
-    public Long createArticle(CreateArticleRequest request) {
+    public CreateArticleResponse createArticle(CreateArticleRequest request) {
         DocumentType documentType = validateDocumentType(request.documentTypeId());
         SubjectDomain subjectDomain = validateSubjectDomain(request.subjectDomainId());
 
@@ -68,7 +68,7 @@ public class ArticleService {
 
         Article savedArticleId = articleRepository.save(article);
 
-        return savedArticleId.getId();
+        return CreateArticleResponse.of(savedArticleId.getId());
     }
 
     @Transactional
