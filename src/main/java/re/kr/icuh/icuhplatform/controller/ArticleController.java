@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import re.kr.icuh.icuhplatform.dto.article.*;
 import re.kr.icuh.icuhplatform.global.common.ApiResponse;
@@ -30,18 +29,18 @@ public class ArticleController {
     }
 
     @GetMapping("/articles/{id}")
-    public ResponseEntity<ApiResponse<ArticleResponse>> getArticle(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success(articleService.findArticleById(id)));
+    public ApiResponse<ArticleResponse> getArticle(@PathVariable Long id) {
+        return ApiResponse.success(articleService.findArticleById(id));
     }
 
     @PostMapping("/articles")
-    public ResponseEntity<ApiResponse<CreateArticleResponse>> createArticle(@Valid @RequestBody CreateArticleRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(articleService.createArticle(request)));
+    public ApiResponse<CreateArticleResponse> createArticle(@Valid @RequestBody CreateArticleRequest request) {
+        return ApiResponse.success(articleService.createArticle(request));
     }
 
     @PostMapping("/articles/{id}")
-    public ResponseEntity<ApiResponse<ArticleResponse>> requestArticleUpdate(@PathVariable Long id, @RequestBody RequestStatusChange request) {
-        return ResponseEntity.ok(ApiResponse.success(articleService.requestArticleUpdate(id, request)));
+    public ApiResponse<ArticleResponse> requestArticleUpdate(@PathVariable Long id, @RequestBody RequestStatusChange request) {
+        return ApiResponse.success(articleService.requestArticleUpdate(id, request));
     }
 
     @PatchMapping("/articles/{id}")
