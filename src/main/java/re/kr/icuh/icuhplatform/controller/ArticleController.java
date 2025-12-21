@@ -38,7 +38,7 @@ public class ArticleController {
     }
 
     @PostMapping("/articles")
-    public ResponseEntity<ApiResponse<CreateArticleResponse>> createArticle(@RequestBody @Valid CreateArticleRequest request) {
+    public ResponseEntity<ApiResponse<CreateArticleResponse>> createArticle(@Valid @RequestBody CreateArticleRequest request) {
         return ResponseEntity.ok(ApiResponse.success(articleService.createArticle(request)));
     }
 
@@ -48,7 +48,7 @@ public class ArticleController {
     }
 
     @PatchMapping("/articles/{id}")
-    public ResponseEntity<ApiResponse<?>> updateArticle(@PathVariable Long id, @RequestBody @Valid UpdateArticleRequest request) {
+    public ResponseEntity<ApiResponse<?>> updateArticle(@PathVariable Long id, @Valid @RequestBody UpdateArticleRequest request) {
         return ResponseEntity.ok(ApiResponse.success(articleService.updateArticle(id, request)));
     }
 
