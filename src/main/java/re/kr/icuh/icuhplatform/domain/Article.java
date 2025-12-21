@@ -120,11 +120,6 @@ public class Article {
         this.views++;
     }
 
-    // 상태변경
-    public void changeStatus(ArticleStatus status) {
-        this.status = status;
-    }
-
     // 비밀번호 검증 메서드
     public boolean validatePassword(String password) {
         // 실제 구현에서는 암호화된 비밀번호 비교 로직 필요

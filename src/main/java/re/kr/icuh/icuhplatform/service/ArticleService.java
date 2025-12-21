@@ -8,13 +8,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import re.kr.icuh.icuhplatform.domain.*;
+import re.kr.icuh.icuhplatform.domain.Article;
+import re.kr.icuh.icuhplatform.domain.ArticleStatus;
+import re.kr.icuh.icuhplatform.domain.DocumentType;
+import re.kr.icuh.icuhplatform.domain.SubjectDomain;
 import re.kr.icuh.icuhplatform.dto.article.*;
 import re.kr.icuh.icuhplatform.global.exception.BusinessException;
 import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
-import re.kr.icuh.icuhplatform.repository.*;
+import re.kr.icuh.icuhplatform.repository.ArticleQueryRepository;
+import re.kr.icuh.icuhplatform.repository.ArticleRepository;
+import re.kr.icuh.icuhplatform.repository.DocumentTypeRepository;
+import re.kr.icuh.icuhplatform.repository.SubjectDomainRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,8 +28,6 @@ import java.util.stream.Collectors;
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
-    private final ArticleEditRequestRepository articleEditRequestRepository;
-    private final ArticleStatusHistoryRepository articleStatusHistoryRepository;
     private final DocumentTypeRepository documentTypeRepository;
     private final SubjectDomainRepository subjectDomainRepository;
     private final ArticleQueryRepository articleQueryRepository;
@@ -120,16 +123,6 @@ public class ArticleService {
         article.softDelete();
         article.getFiles().stream()
                 .forEach(file -> file.softDelete());
-
-        ArticleStatusHistory articleStatusHistory = ArticleStatusHistory.builder()
-                .article(article)
-                .status(ArticleStatus.DELETED_PENDING)
-                .note(request.reason())
-                .changedBy(article.getAuthor())
-                .changedAt(LocalDateTime.now())
-                .build();
-
-        articleStatusHistoryRepository.save(articleStatusHistory);
     }
 
     private DocumentType validateDocumentType(Long documentTypeId) {

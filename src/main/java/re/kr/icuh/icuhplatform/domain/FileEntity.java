@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import re.kr.icuh.icuhplatform.dto.UpdateArticleRequestJsonConverter;
 
 import java.time.LocalDateTime;
 
@@ -47,11 +46,6 @@ public class FileEntity {
     @Column(nullable = false)
     private FileStatus status;
 
-    @Column(name = "pending_update")
-    @Convert(converter = UpdateArticleRequestJsonConverter.class)
-    private FileEditRequest pendingUpdate;
-
-
     @Builder
     public FileEntity(Article article, String originalFilename, String storedFilename, String filePath, Long fileSize, String extension, FileStatus status) {
         this.article = article;
@@ -61,7 +55,6 @@ public class FileEntity {
         this.fileSize = fileSize;
         this.extension = extension;
         this.status = status;
-        this.pendingUpdate = null;
     }
 
     // 소프트 삭제 메서드
