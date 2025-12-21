@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import re.kr.icuh.icuhplatform.dto.article.*;
 import re.kr.icuh.icuhplatform.global.common.ApiResponse;
-import re.kr.icuh.icuhplatform.global.common.SuccessCode;
 import re.kr.icuh.icuhplatform.service.ArticleService;
 
 @Slf4j
@@ -48,14 +47,13 @@ public class ArticleController {
     }
 
     @PatchMapping("/articles/{id}")
-    public ResponseEntity<ApiResponse<?>> updateArticle(@PathVariable Long id, @Valid @RequestBody UpdateArticleRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(articleService.updateArticle(id, request)));
+    public ApiResponse<?> updateArticle(@PathVariable Long id, @Valid @RequestBody UpdateArticleRequest request) {
+        return ApiResponse.success(articleService.updateArticle(id, request));
     }
 
-    @DeleteMapping("/articles/{id}")
-    public ResponseEntity<ApiResponse<?>> requestArticleDelete(@PathVariable Long id, @RequestBody RequestStatusChange request) {
-        articleService.requestArticleDelete(id, request);
-
-        return ResponseEntity.ok(ApiResponse.success(SuccessCode.ARTICLE_DELETE_PENDING));
+    @DeleteMapping("/articles/{articleId}")
+    public ApiResponse<?> deleteArticle(@PathVariable Long articleId, @Valid @RequestBody DeleteArticleRequest request) {
+        articleService.deleteArticle(articleId, request);
+        return ApiResponse.success("ok");
     }
 }

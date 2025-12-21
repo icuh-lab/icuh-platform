@@ -111,8 +111,8 @@ public class ArticleService {
     }
 
     @Transactional
-    public void requestArticleDelete(Long id, RequestStatusChange request) {
-        Article article = articleRepository.findById(id)
+    public void deleteArticle(Long articleId, DeleteArticleRequest request) {
+        Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
 
         if (!article.validatePassword(request.password())) {
@@ -120,8 +120,6 @@ public class ArticleService {
         }
 
         article.softDelete();
-        article.getFiles().stream()
-                .forEach(file -> file.softDelete());
     }
 
     private DocumentType validateDocumentType(Long documentTypeId) {
