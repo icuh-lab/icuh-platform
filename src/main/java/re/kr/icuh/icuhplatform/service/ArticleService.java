@@ -85,21 +85,9 @@ public class ArticleService {
         Article article = articleRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
 
-        article.changeStatus(ArticleStatus.UPDATED_PENDING);
-
         if (!article.validatePassword(request.password())) {
             throw new BusinessException(ErrorCode.INVALID_PASSWORD);
         }
-
-        ArticleStatusHistory articleStatusHistory = ArticleStatusHistory.builder()
-                .article(article)
-                .status(ArticleStatus.UPDATED_PENDING)
-                .note(request.reason())
-                .changedBy(article.getAuthor())
-                .changedAt(LocalDateTime.now())
-                .build();
-
-        articleStatusHistoryRepository.save(articleStatusHistory);
 
         return ArticleResponse.fromEntity(article);
     }
@@ -117,7 +105,7 @@ public class ArticleService {
         savedArticle.setPendingUpdate(request);
         savedArticle.setPendingFileUpdate(request.newFiles());
 
-        return 0L;
+        return savedArticle.getId();
     }
 
     @Transactional
