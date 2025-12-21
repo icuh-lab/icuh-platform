@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import re.kr.icuh.icuhplatform.domain.Article;
 import re.kr.icuh.icuhplatform.domain.ArticleStatus;
 import re.kr.icuh.icuhplatform.domain.QArticle;
+import re.kr.icuh.icuhplatform.dto.article.ArticleSearchRequest;
 
 import java.util.List;
 
@@ -20,24 +21,24 @@ public class ArticleQueryRepository {
         this.queryFactory = queryFactory;
     }
 
-    public List<Article> findApprovedArticles(String documentType, String  subjectDomain, String source, String query, Pageable pageable) {
+    public List<Article> findApprovedArticles(ArticleSearchRequest request, Pageable pageable) {
         QArticle article = QArticle.article;
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (documentType != null) {
-            builder.and(article.documentType.enName.eq(documentType));
+        if (request.documentType() != null) {
+            builder.and(article.documentType.enName.eq(request.documentType()));
         }
 
-        if (subjectDomain != null) {
-            builder.and(article.subjectDomain.enName.eq(subjectDomain));
+        if (request.subjectDomain() != null) {
+            builder.and(article.subjectDomain.enName.eq(request.subjectDomain()));
         }
 
-        if (source != null) {
-            builder.and(article.source.eq(source));
+        if (request.source() != null) {
+            builder.and(article.source.eq(request.source()));
         }
 
-        if (query != null) {
-            builder.and(article.title.containsIgnoreCase(query));
+        if (request.query() != null) {
+            builder.and(article.title.containsIgnoreCase(request.query()));
         }
 
         // 승인 상태 조건을 묶어서 처리
