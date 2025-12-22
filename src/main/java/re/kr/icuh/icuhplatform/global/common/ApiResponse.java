@@ -35,6 +35,10 @@ public class ApiResponse<T> {
         return success(HttpStatus.OK, "Success", data);
     }
 
+    public static <T> ApiResponse<T> success() {
+        return success(HttpStatus.OK, "Success", null);
+    }
+
     public static <T> ApiResponse<T> created(T data) {
         return success(HttpStatus.CREATED, "Created successfully", data);
     }

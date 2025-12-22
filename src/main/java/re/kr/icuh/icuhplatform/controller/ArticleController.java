@@ -44,13 +44,14 @@ public class ArticleController {
     }
 
     @PatchMapping("/articles/{id}")
-    public ApiResponse<?> updateArticle(@PathVariable Long id, @Valid @RequestBody UpdateArticleRequest request) {
-        return ApiResponse.success(articleService.updateArticle(id, request));
+    public ApiResponse<Void> updateArticle(@PathVariable Long id, @Valid @RequestBody UpdateArticleRequest request) {
+        articleService.updateArticle(id, request);
+        return ApiResponse.success();
     }
 
     @DeleteMapping("/articles/{articleId}")
-    public ApiResponse<?> deleteArticle(@PathVariable Long articleId, @Valid @RequestBody DeleteArticleRequest request) {
+    public ApiResponse<Void> deleteArticle(@PathVariable Long articleId, @Valid @RequestBody DeleteArticleRequest request) {
         articleService.deleteArticle(articleId, request);
-        return ApiResponse.success("ok");
+        return ApiResponse.success();
     }
 }
