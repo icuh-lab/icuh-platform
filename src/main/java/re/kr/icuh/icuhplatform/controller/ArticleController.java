@@ -7,12 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import re.kr.icuh.icuhplatform.dto.article.*;
 import re.kr.icuh.icuhplatform.global.common.ApiResponse;
-import re.kr.icuh.icuhplatform.global.common.SuccessCode;
 import re.kr.icuh.icuhplatform.service.ArticleService;
 
 @Slf4j
@@ -23,41 +20,38 @@ public class ArticleController {
 
     private final ArticleService articleService;
 
-    @PostMapping("/articles")
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public ResponseEntity<ApiResponse<?>> createArticle(@RequestBody @Valid CreateArticleRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(articleService.createArticle(request)));
-    }
-
     @GetMapping("/articles")
-    public ResponseEntity<ApiResponse<Page<ArticleListResponse>>> findArticles(@RequestParam(required = false) String documentType,
-                                                                               @RequestParam(required = false) String subjectDomain,
-                                                                               @RequestParam(required = false) String source,
-                                                                               @RequestParam(required = false) String query,
-                                                                               @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    public ApiResponse<Page<ArticleListResponse>> findArticles(
+            ArticleRequest request,
+            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        return ResponseEntity.ok(ApiResponse.success(articleService.findArticles(documentType, subjectDomain, source, query, pageable)));
+        return ApiResponse.success(articleService.findArticles(request, pageable));
     }
 
     @GetMapping("/articles/{id}")
-    public ResponseEntity<ApiResponse<ArticleResponse>> getArticle(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success(articleService.findArticleById(id)));
+    public ApiResponse<ArticleDetailResponse> getArticle(@PathVariable Long id) {
+        return ApiResponse.success(articleService.findArticleById(id));
+    }
+
+    @PostMapping("/articles")
+    public ApiResponse<CreateArticleResponse> createArticle(@Valid @RequestBody CreateArticleRequest request) {
+        return ApiResponse.success(articleService.createArticle(request));
     }
 
     @PostMapping("/articles/{id}")
-    public ResponseEntity<ApiResponse<ArticleResponse>> requestArticleUpdate(@PathVariable Long id, @RequestBody RequestStatusChange request) {
-        return ResponseEntity.ok(ApiResponse.success(articleService.requestArticleUpdate(id, request)));
+    public ApiResponse<ArticleDetailResponse> modifyArticleStatus(@PathVariable Long id, @RequestBody ModifyArticleStatusRequest request) {
+        return ApiResponse.success(articleService.modifyArticleStatus(id, request));
     }
 
     @PatchMapping("/articles/{id}")
-    public ResponseEntity<ApiResponse<?>> updateArticle(@PathVariable Long id, @RequestBody @Valid UpdateArticleRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(articleService.updateArticle(id, request)));
+    public ApiResponse<Void> updateArticle(@PathVariable Long id, @Valid @RequestBody UpdateArticleRequest request) {
+        articleService.updateArticle(id, request);
+        return ApiResponse.success();
     }
 
-    @DeleteMapping("/articles/{id}")
-    public ResponseEntity<ApiResponse<?>> requestArticleDelete(@PathVariable Long id, @RequestBody RequestStatusChange request) {
-        articleService.requestArticleDelete(id, request);
-
-        return ResponseEntity.ok(ApiResponse.success(SuccessCode.ARTICLE_DELETE_PENDING));
+    @DeleteMapping("/articles/{articleId}")
+    public ApiResponse<Void> deleteArticle(@PathVariable Long articleId, @Valid @RequestBody DeleteArticleRequest request) {
+        articleService.deleteArticle(articleId, request);
+        return ApiResponse.success();
     }
 }

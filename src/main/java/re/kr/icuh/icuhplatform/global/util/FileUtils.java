@@ -2,11 +2,7 @@ package re.kr.icuh.icuhplatform.global.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
-import re.kr.icuh.icuhplatform.domain.FileMetadata;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.UUID;
 
 @Slf4j
@@ -33,54 +29,4 @@ public class FileUtils {
     /**
      * 파일 크기를 Integer로 변환합니다.
      */
-    public Long convertToIntegerSize(long size) {
-        if (size > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException("File size is too large to convert to Integer");
-        }
-        return size;
-    }
-
-    /**
-     * MultipartFile을 임시 File로 변환합니다.
-     */
-    public File convertToTempFile(MultipartFile file) throws IOException {
-        log.info("convertToTempFile - file: {}", file.getOriginalFilename());
-
-        // 원본 파일의 확장자 추출
-        String extension = extractExtensionName(file.getOriginalFilename());
-        // 확장자가 없으면 .tmp 사용
-        String suffix = (extension == null || extension.isEmpty()) ? ".tmp" : "." + extension;
-
-        // 안전한 이름(UUID)으로 임시 파일 생성
-        File tempFile = File.createTempFile(UUID.randomUUID().toString() + "_", suffix);
-
-        log.info("convertToTempFile - created tempFile: {}", tempFile.getAbsoluteFile());
-        file.transferTo(tempFile);
-        log.info("convertToTempFile - tempFile size: {}", tempFile.length());
-        return tempFile;
-    }
-
-    /**
-     * 임시 파일을 삭제합니다.
-     */
-    public boolean deleteTempFile(File file) {
-        if (file == null) {
-            log.info("file is null");
-        }
-        return file.delete();
-    }
-
-    /**
-     * 파일 메타데이터를 생성합니다.
-     */
-    public FileMetadata createFileMetadata(MultipartFile file) {
-        return FileMetadata.builder()
-                .originalName(file.getOriginalFilename())
-                .savedName(createStoreFileName(file.getOriginalFilename()))
-                .extensionName(extractExtensionName(file.getOriginalFilename()))
-                .size(convertToIntegerSize(file.getSize()))
-                .contentType(file.getContentType())
-                .build();
-    }
-
 }

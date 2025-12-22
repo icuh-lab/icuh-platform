@@ -8,13 +8,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import re.kr.icuh.icuhplatform.domain.*;
+import re.kr.icuh.icuhplatform.domain.Article;
+import re.kr.icuh.icuhplatform.domain.ArticleStatus;
+import re.kr.icuh.icuhplatform.domain.DocumentType;
+import re.kr.icuh.icuhplatform.domain.SubjectDomain;
 import re.kr.icuh.icuhplatform.dto.article.*;
 import re.kr.icuh.icuhplatform.global.exception.BusinessException;
 import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
-import re.kr.icuh.icuhplatform.repository.*;
+import re.kr.icuh.icuhplatform.repository.ArticleQueryRepository;
+import re.kr.icuh.icuhplatform.repository.ArticleRepository;
+import re.kr.icuh.icuhplatform.repository.DocumentTypeRepository;
+import re.kr.icuh.icuhplatform.repository.SubjectDomainRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,15 +28,13 @@ import java.util.stream.Collectors;
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
-    private final ArticleEditRequestRepository articleEditRequestRepository;
-    private final ArticleStatusHistoryRepository articleStatusHistoryRepository;
     private final DocumentTypeRepository documentTypeRepository;
     private final SubjectDomainRepository subjectDomainRepository;
     private final ArticleQueryRepository articleQueryRepository;
 
     @Transactional(readOnly = true)
-    public Page<ArticleListResponse> findArticles(String documentType, String  subjectDomain, String source, String query, Pageable pageable) {
-        List<Article> articles = articleQueryRepository.findApprovedArticles(documentType, subjectDomain, source, query, pageable);
+    public Page<ArticleListResponse> findArticles(ArticleRequest request, Pageable pageable) {
+        List<Article> articles = articleQueryRepository.findApprovedArticles(request, pageable);
         JPAQuery<Long> countQuery = articleQueryRepository.countApprovedArticles();
 
         List<ArticleListResponse> articleListResponses = articles.stream()
@@ -42,7 +45,7 @@ public class ArticleService {
     }
 
     @Transactional
-    public Long createArticle(CreateArticleRequest request) {
+    public CreateArticleResponse createArticle(CreateArticleRequest request) {
         DocumentType documentType = validateDocumentType(request.documentTypeId());
         SubjectDomain subjectDomain = validateSubjectDomain(request.subjectDomainId());
 
@@ -65,11 +68,11 @@ public class ArticleService {
 
         Article savedArticleId = articleRepository.save(article);
 
-        return savedArticleId.getId();
+        return CreateArticleResponse.of(savedArticleId.getId());
     }
 
     @Transactional
-    public ArticleResponse findArticleById(Long id) {
+    public ArticleDetailResponse findArticleById(Long id) {
         if (!articleRepository.findById(id).isPresent()) {
             throw new BusinessException(ErrorCode.ARTICLE_NOT_FOUND);
         }
@@ -77,11 +80,11 @@ public class ArticleService {
         Article article = articleRepository.findById(id).get();
         article.increaseViews();
 
-        return ArticleResponse.fromEntity(article);
+        return ArticleDetailResponse.of(article);
     }
 
     @Transactional
-    public ArticleResponse requestArticleUpdate(Long id, RequestStatusChange request) {
+    public ArticleDetailResponse modifyArticleStatus(Long id, ModifyArticleStatusRequest request) {
         Article article = articleRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
 
@@ -89,7 +92,7 @@ public class ArticleService {
             throw new BusinessException(ErrorCode.INVALID_PASSWORD);
         }
 
-        return ArticleResponse.fromEntity(article);
+        return ArticleDetailResponse.of(article);
     }
 
     @Transactional
@@ -103,14 +106,13 @@ public class ArticleService {
 
         // UpdateArticleRequest 객체를 json 형식으로 컬럼에 집어넣어야함
         savedArticle.setPendingUpdate(request);
-        savedArticle.setPendingFileUpdate(request.newFiles());
 
         return savedArticle.getId();
     }
 
     @Transactional
-    public void requestArticleDelete(Long id, RequestStatusChange request) {
-        Article article = articleRepository.findById(id)
+    public void deleteArticle(Long articleId, DeleteArticleRequest request) {
+        Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
 
         if (!article.validatePassword(request.password())) {
@@ -118,18 +120,6 @@ public class ArticleService {
         }
 
         article.softDelete();
-        article.getFiles().stream()
-                .forEach(file -> file.softDelete());
-
-        ArticleStatusHistory articleStatusHistory = ArticleStatusHistory.builder()
-                .article(article)
-                .status(ArticleStatus.DELETED_PENDING)
-                .note(request.reason())
-                .changedBy(article.getAuthor())
-                .changedAt(LocalDateTime.now())
-                .build();
-
-        articleStatusHistoryRepository.save(articleStatusHistory);
     }
 
     private DocumentType validateDocumentType(Long documentTypeId) {
