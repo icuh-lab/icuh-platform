@@ -17,7 +17,7 @@ import re.kr.icuh.icuhplatform.global.exception.BusinessException;
 import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
 import re.kr.icuh.icuhplatform.global.util.FileUtils;
 import re.kr.icuh.icuhplatform.repository.FileRepository;
-import re.kr.icuh.icuhplatform.service.FileStorageService;
+import re.kr.icuh.icuhplatform.service.FileService;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -36,7 +36,7 @@ public class FileController {
 
     private final AmazonS3Client amazonS3Client;
     private final FileRepository fileRepository;
-    private final FileStorageService fileStorageService;
+    private final FileService fileStorageService;
 
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucketName;

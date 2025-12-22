@@ -18,7 +18,7 @@ import re.kr.icuh.icuhplatform.repository.FileRepository;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class FileStorageService {
+public class FileService {
 
     private final FileUtils fileUtils;
     private final FileRepository fileRepository;
