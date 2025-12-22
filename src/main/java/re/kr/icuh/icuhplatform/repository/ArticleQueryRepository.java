@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import re.kr.icuh.icuhplatform.domain.Article;
 import re.kr.icuh.icuhplatform.domain.ArticleStatus;
 import re.kr.icuh.icuhplatform.domain.QArticle;
-import re.kr.icuh.icuhplatform.dto.article.ArticleSearchRequest;
+import re.kr.icuh.icuhplatform.dto.article.ArticleRequest;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public class ArticleQueryRepository {
         this.queryFactory = queryFactory;
     }
 
-    public List<Article> findApprovedArticles(ArticleSearchRequest request, Pageable pageable) {
+    public List<Article> findApprovedArticles(ArticleRequest request, Pageable pageable) {
         QArticle article = QArticle.article;
         BooleanBuilder builder = new BooleanBuilder();
 

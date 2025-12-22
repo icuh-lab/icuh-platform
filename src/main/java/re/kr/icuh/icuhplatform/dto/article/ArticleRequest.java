@@ -1,6 +1,6 @@
 package re.kr.icuh.icuhplatform.dto.article;
 
-public record ArticleSearchRequest(
+public record ArticleRequest(
         String documentType,
         String subjectDomain,
         String source,

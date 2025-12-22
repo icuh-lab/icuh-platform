@@ -33,7 +33,7 @@ public class ArticleService {
     private final ArticleQueryRepository articleQueryRepository;
 
     @Transactional(readOnly = true)
-    public Page<ArticleListResponse> findArticles(ArticleSearchRequest request, Pageable pageable) {
+    public Page<ArticleListResponse> findArticles(ArticleRequest request, Pageable pageable) {
         List<Article> articles = articleQueryRepository.findApprovedArticles(request, pageable);
         JPAQuery<Long> countQuery = articleQueryRepository.countApprovedArticles();
 
@@ -72,7 +72,7 @@ public class ArticleService {
     }
 
     @Transactional
-    public ArticleResponse findArticleById(Long id) {
+    public ArticleDetailResponse findArticleById(Long id) {
         if (!articleRepository.findById(id).isPresent()) {
             throw new BusinessException(ErrorCode.ARTICLE_NOT_FOUND);
         }
@@ -80,11 +80,11 @@ public class ArticleService {
         Article article = articleRepository.findById(id).get();
         article.increaseViews();
 
-        return ArticleResponse.fromEntity(article);
+        return ArticleDetailResponse.of(article);
     }
 
     @Transactional
-    public ArticleResponse requestArticleUpdate(Long id, RequestStatusChange request) {
+    public ArticleDetailResponse modifyArticleStatus(Long id, ModifyArticleStatusRequest request) {
         Article article = articleRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
 
@@ -92,7 +92,7 @@ public class ArticleService {
             throw new BusinessException(ErrorCode.INVALID_PASSWORD);
         }
 
-        return ArticleResponse.fromEntity(article);
+        return ArticleDetailResponse.of(article);
     }
 
     @Transactional

@@ -22,14 +22,14 @@ public class ArticleController {
 
     @GetMapping("/articles")
     public ApiResponse<Page<ArticleListResponse>> findArticles(
-            ArticleSearchRequest request,
+            ArticleRequest request,
             @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
         return ApiResponse.success(articleService.findArticles(request, pageable));
     }
 
     @GetMapping("/articles/{id}")
-    public ApiResponse<ArticleResponse> getArticle(@PathVariable Long id) {
+    public ApiResponse<ArticleDetailResponse> getArticle(@PathVariable Long id) {
         return ApiResponse.success(articleService.findArticleById(id));
     }
 
@@ -39,8 +39,8 @@ public class ArticleController {
     }
 
     @PostMapping("/articles/{id}")
-    public ApiResponse<ArticleResponse> requestArticleUpdate(@PathVariable Long id, @RequestBody RequestStatusChange request) {
-        return ApiResponse.success(articleService.requestArticleUpdate(id, request));
+    public ApiResponse<ArticleDetailResponse> modifyArticleStatus(@PathVariable Long id, @RequestBody ModifyArticleStatusRequest request) {
+        return ApiResponse.success(articleService.modifyArticleStatus(id, request));
     }
 
     @PatchMapping("/articles/{id}")
