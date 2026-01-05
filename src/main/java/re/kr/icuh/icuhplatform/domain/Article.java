@@ -103,24 +103,20 @@ public class Article {
         return Hashing.sha256().hashString(tempPassword, StandardCharsets.UTF_8).toString();
     }
 
-    // 소프트 삭제 메서드
-    public void softDelete() {
+    public void delete() {
         this.status = ArticleStatus.DELETED_PENDING;
         this.updatedAt = LocalDateTime.now();
     }
 
-    // 조회수 증가 메서드
     public void increaseViews() {
         this.views++;
     }
 
-    // 비밀번호 검증 메서드
     public boolean validatePassword(String password) {
-        // 실제 구현에서는 암호화된 비밀번호 비교 로직 필요
         return this.tempPassword.equals(sha256Encode(password));
     }
 
-    public void setPendingUpdate(UpdateArticleRequest request) {
+    public void updateContent(UpdateArticleRequest request) {
         this.pendingUpdate = request;
     }
 }
