@@ -7,17 +7,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import re.kr.icuh.icuhplatform.domain.Article;
-import re.kr.icuh.icuhplatform.domain.ArticleStatus;
-import re.kr.icuh.icuhplatform.domain.DocumentType;
-import re.kr.icuh.icuhplatform.domain.SubjectDomain;
+import re.kr.icuh.icuhplatform.domain.*;
 import re.kr.icuh.icuhplatform.dto.article.*;
+import re.kr.icuh.icuhplatform.dto.file.CreateArticleWithFilesRequest;
 import re.kr.icuh.icuhplatform.global.exception.BusinessException;
 import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
-import re.kr.icuh.icuhplatform.repository.ArticleQueryRepository;
-import re.kr.icuh.icuhplatform.repository.ArticleRepository;
-import re.kr.icuh.icuhplatform.repository.DocumentTypeRepository;
-import re.kr.icuh.icuhplatform.repository.SubjectDomainRepository;
+import re.kr.icuh.icuhplatform.global.util.FileUtils;
+import re.kr.icuh.icuhplatform.repository.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,9 +23,11 @@ import java.util.stream.Collectors;
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
+    private final FileRepository fileRepository;
     private final DocumentTypeRepository documentTypeRepository;
     private final SubjectDomainRepository subjectDomainRepository;
     private final ArticleQueryRepository articleQueryRepository;
+    private final FileUtils fileUtils;
 
     @Transactional(readOnly = true)
     public Page<ArticleListResponse> findArticles(ArticleRequest request, Pageable pageable) {
@@ -45,6 +43,7 @@ public class ArticleService {
 
     @Transactional
     public CreateArticleResponse createArticle(CreateArticleRequest request) {
+        // TODO: 게시글이 생성되다가 실패하는 경우 게시글 생성 행위 자체가 rollback이 되어야한다.
         DocumentType documentType = validateDocumentType(request.documentTypeId());
         SubjectDomain subjectDomain = validateSubjectDomain(request.subjectDomainId());
 
@@ -98,6 +97,53 @@ public class ArticleService {
         validatePassword(savedArticle, request.password());
 
         savedArticle.delete();
+    }
+
+    @Transactional
+    public CreateArticleResponse createArticleWithFiles(CreateArticleWithFilesRequest request) {
+        try {
+            // 1. 게시글 저장
+            DocumentType documentType = validateDocumentType(request.documentTypeId());
+            SubjectDomain subjectDomain = validateSubjectDomain(request.subjectDomainId());
+
+            Article article = Article.builder()
+                    .title(request.title())
+                    .description(request.description())
+                    .author(request.author())
+                    .authorOrganization(request.authorOrganization())
+                    .department(request.department())
+                    .tempPassword(request.tempPassword())
+                    .views(0)
+                    .status(ArticleStatus.PENDING)
+                    .documentType(documentType)
+                    .subjectDomain(subjectDomain)
+                    .source(request.source())
+                    .isDeleted(false)
+                    .deletedAt(null)
+                    .build();
+
+
+            // 2. 파일 메타데이터 저장 (게시글 ID와 연결)
+            List<FileEntity> files = request.completedFiles().stream()
+                    .map(fileInfo -> FileEntity.builder()
+                                    .article(article)
+                                    .originalFilename(fileInfo.originalFileName())
+                                    .storedFilename(fileInfo.originalFileName())
+                                    .filePath(fileInfo.s3Location())
+                                    .fileSize(fileInfo.fileSize())
+                                    .extension(fileUtils.extractExtensionName(fileInfo.originalFileName()))
+                                    .status(FileStatus.PENDING)
+                                    .build()
+                            )
+                    .collect(Collectors.toList());
+
+            fileRepository.saveAll(files);
+
+            return null;
+        } catch (Exception e) {
+            // 실패 시: 업로드된 S3 파일 삭제 + 에러 응답
+            throw new BusinessException(ErrorCode.FILE_SIZE_EXCEEDED);
+        }
     }
 
     private static void validatePassword(Article article, String password) {

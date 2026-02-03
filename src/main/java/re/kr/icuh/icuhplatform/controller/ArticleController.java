@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import re.kr.icuh.icuhplatform.dto.article.*;
+import re.kr.icuh.icuhplatform.dto.file.CreateArticleWithFilesRequest;
 import re.kr.icuh.icuhplatform.global.common.ApiResponse;
 import re.kr.icuh.icuhplatform.service.ArticleService;
 
@@ -53,5 +54,11 @@ public class ArticleController {
     public ApiResponse<Void> deleteArticle(@PathVariable Long articleId, @Valid @RequestBody DeleteArticleRequest request) {
         articleService.deleteArticle(articleId, request);
         return ApiResponse.success();
+    }
+
+    // 새로운 통합 API
+    @PostMapping("/articles-with-files")
+    public ApiResponse<CreateArticleResponse> createArticleWithFiles(@Valid @RequestBody CreateArticleWithFilesRequest request) {
+        return ApiResponse.success(articleService.createArticleWithFiles(request));
     }
 }
