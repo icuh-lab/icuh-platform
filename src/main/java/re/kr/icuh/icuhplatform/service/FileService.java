@@ -25,7 +25,7 @@ public class FileService {
     private final ArticleRepository articleRepository;
 
     @Transactional
-    public void createFileMetaData(CompleteUploadRequestDto request, String location) {
+    public void createFileEntity(CompleteUploadRequestDto request, String location) {
         Article savedArticle = articleRepository.findById(request.getArticleId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
 
