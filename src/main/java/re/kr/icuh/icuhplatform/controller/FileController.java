@@ -76,9 +76,8 @@ public class FileController {
     }
 
     @PostMapping("/complete-upload")
-    public ResponseEntity<CompleteFileUploadResponseDto> completeUpload(@RequestBody CompleteUploadRequestDto request) {
+    public ResponseEntity<CompleteUploadResponseDto> completeUpload(@RequestBody CompleteUploadRequestDto request) {
 
-        // 클라이언트가 보낸 etag 리스트를 AWS SDK용 PartETag 리스트로 변환
         List<PartETag> partETags = request.getParts().stream()
                 .map(part -> new PartETag(part.getPartNumber(), part.getEtag()))
                 .collect(Collectors.toList());
@@ -90,19 +89,18 @@ public class FileController {
                 partETags
         );
 
-        CompleteMultipartUploadResult result = amazonS3Client.completeMultipartUpload(completeMultipartUploadRequest);
+        CompleteMultipartUploadResult completeMultipartUploadResult = amazonS3Client.completeMultipartUpload(completeMultipartUploadRequest);
         log.info("Upload complete for {}", request.getFileName());
 
-        // 기존: 여기서 DB로 저장
+        // ❌ 기존: DB 저장
         // fileStorageService.createFileEntity(request, completeMultipartUploadResult.getLocation());
 
-        // 변경: S3 업로드만 완료하고 메타데이터만 전달
-        return ResponseEntity.ok(new CompleteFileUploadResponseDto(
-                request.getUploadId(),
-                request.getFileName(),
-                result.getLocation(),
-                result.getETag()
-                ));
+        // ✅ 수정: DB 저장 안 하고, 파일 메타데이터만 응답
+        CompleteUploadResponseDto response = fileStorageService.updateFileMetaData(
+                request, completeMultipartUploadResult.getLocation()
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/update-upload")

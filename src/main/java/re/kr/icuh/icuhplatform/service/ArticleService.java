@@ -122,24 +122,26 @@ public class ArticleService {
                     .deletedAt(null)
                     .build();
 
+            articleRepository.save(article);
+
 
             // 2. 파일 메타데이터 저장 (게시글 ID와 연결)
             List<FileEntity> files = request.completedFiles().stream()
                     .map(fileInfo -> FileEntity.builder()
-                                    .article(article)
-                                    .originalFilename(fileInfo.originalFileName())
-                                    .storedFilename(fileInfo.originalFileName())
-                                    .filePath(fileInfo.s3Location())
-                                    .fileSize(fileInfo.fileSize())
-                                    .extension(fileUtils.extractExtensionName(fileInfo.originalFileName()))
-                                    .status(FileStatus.PENDING)
-                                    .build()
-                            )
+                            .article(article)
+                            .originalFilename(fileInfo.originalFileName())
+                            .storedFilename(fileInfo.storedFileName())
+                            .filePath(fileInfo.filePath())
+                            .fileSize(fileInfo.fileSize())
+                            .extension(fileInfo.extension())
+                            .status(FileStatus.PENDING)
+                            .build()
+                    )
                     .collect(Collectors.toList());
 
             fileRepository.saveAll(files);
 
-            return null;
+            return CreateArticleResponse.of(article.getId());
         } catch (Exception e) {
             // 실패 시: 업로드된 S3 파일 삭제 + 에러 응답
             throw new BusinessException(ErrorCode.FILE_SIZE_EXCEEDED);
