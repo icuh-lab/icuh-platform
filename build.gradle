@@ -49,6 +49,10 @@ dependencies {
 
     testImplementation 'org.projectlombok:lombok:1.18.30'
 
+    // log
+    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
 }
 
 tasks.named('test') {
