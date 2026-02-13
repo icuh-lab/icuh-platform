@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
 import re.kr.icuh.icuhplatform.dto.article.*;
 import re.kr.icuh.icuhplatform.dto.file.CreateArticleWithFilesRequest;
@@ -24,8 +25,10 @@ public class ArticleController {
     @GetMapping("/articles")
     public ApiResponse<Page<ArticleListResponse>> findArticles(
             ArticleRequest request,
-            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-
+            @PageableDefault(page = 0, size = 10)
+            @SortDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
         return ApiResponse.success(articleService.findArticles(request, pageable));
     }
 
