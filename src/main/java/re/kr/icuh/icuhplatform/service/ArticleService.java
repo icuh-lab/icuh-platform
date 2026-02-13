@@ -12,8 +12,10 @@ import re.kr.icuh.icuhplatform.dto.article.*;
 import re.kr.icuh.icuhplatform.dto.file.CreateArticleWithFilesRequest;
 import re.kr.icuh.icuhplatform.global.exception.BusinessException;
 import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
-import re.kr.icuh.icuhplatform.global.util.FileUtils;
-import re.kr.icuh.icuhplatform.repository.*;
+import re.kr.icuh.icuhplatform.repository.ArticleRepository;
+import re.kr.icuh.icuhplatform.repository.DocumentTypeRepository;
+import re.kr.icuh.icuhplatform.repository.FileRepository;
+import re.kr.icuh.icuhplatform.repository.SubjectDomainRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,13 +28,15 @@ public class ArticleService {
     private final FileRepository fileRepository;
     private final DocumentTypeRepository documentTypeRepository;
     private final SubjectDomainRepository subjectDomainRepository;
-    private final ArticleQueryRepository articleQueryRepository;
-    private final FileUtils fileUtils;
 
     @Transactional(readOnly = true)
     public Page<ArticleListResponse> findArticles(ArticleRequest request, Pageable pageable) {
-        List<Article> articles = articleQueryRepository.findApprovedArticles(request, pageable);
-        JPAQuery<Long> countQuery = articleQueryRepository.countApprovedArticles();
+        /**
+         * 여기서 데이터를 가져오는 쿼리 메소드 하나와, 카운팅하는 쿼리 메소드 하나 이렇게 분리되어 있는데,
+         * 그냥 아싸리 하나의 메소드로 합쳐서 데이터와 카운팅을 하는건 어떨까
+         */
+        List<Article> articles = articleRepository.findApprovedArticles(request, pageable);
+        JPAQuery<Long> countQuery = articleRepository.countApprovedArticles();
 
         List<ArticleListResponse> articleListResponses = articles.stream()
                 .map(ArticleListResponse::fromEntity)
