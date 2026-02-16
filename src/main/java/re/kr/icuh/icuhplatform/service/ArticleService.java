@@ -1,13 +1,12 @@
 package re.kr.icuh.icuhplatform.service;
 
-import com.querydsl.jpa.impl.JPAQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import re.kr.icuh.icuhplatform.domain.*;
+import re.kr.icuh.icuhplatform.dto.PageResponse;
 import re.kr.icuh.icuhplatform.dto.article.*;
 import re.kr.icuh.icuhplatform.dto.file.CreateArticleWithFilesRequest;
 import re.kr.icuh.icuhplatform.global.exception.BusinessException;
@@ -30,19 +29,11 @@ public class ArticleService {
     private final SubjectDomainRepository subjectDomainRepository;
 
     @Transactional(readOnly = true)
-    public Page<ArticleListResponse> findArticles(ArticleRequest request, Pageable pageable) {
-        /**
-         * 여기서 데이터를 가져오는 쿼리 메소드 하나와, 카운팅하는 쿼리 메소드 하나 이렇게 분리되어 있는데,
-         * 그냥 아싸리 하나의 메소드로 합쳐서 데이터와 카운팅을 하는건 어떨까
-         */
-        List<Article> articles = articleRepository.findApprovedArticles(request, pageable);
-        JPAQuery<Long> countQuery = articleRepository.countApprovedArticles();
+    public PageResponse<ArticleListResponse> findArticles(ArticleRequest request, Pageable pageable) {
+        Page<ArticleListResponse> articleListResponsePage = articleRepository.findApprovedArticles(request, pageable)
+                .map(ArticleListResponse::fromEntity);
 
-        List<ArticleListResponse> articleListResponses = articles.stream()
-                .map(ArticleListResponse::fromEntity)
-                .collect(Collectors.toList());
-
-        return PageableExecutionUtils.getPage(articleListResponses, pageable, countQuery::fetchOne);
+        return PageResponse.from(articleListResponsePage);
     }
 
     @Transactional

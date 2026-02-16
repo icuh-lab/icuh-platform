@@ -4,7 +4,9 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import re.kr.icuh.icuhplatform.domain.Article;
 import re.kr.icuh.icuhplatform.domain.ArticleStatus;
 import re.kr.icuh.icuhplatform.domain.QArticle;
@@ -18,7 +20,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom{
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<Article> findApprovedArticles(ArticleRequest request, Pageable pageable) {
+    public Page<Article> findApprovedArticles(ArticleRequest request, Pageable pageable) {
         QArticle article = QArticle.article;
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -44,7 +46,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom{
                 article.status.eq(ArticleStatus.UPDATED_APPROVED)
         );
 
-        return jpaQueryFactory
+        List<Article> articles = jpaQueryFactory
                 .selectFrom(article)
                 .leftJoin(article.documentType).fetchJoin()
                 .leftJoin(article.subjectDomain).fetchJoin()
@@ -53,19 +55,12 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom{
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-    }
 
-    @Override
-    public JPAQuery<Long> countApprovedArticles() {
-        QArticle article = QArticle.article;
-        BooleanBuilder builder = new BooleanBuilder();
-
-        builder.or(article.status.eq(ArticleStatus.APPROVED));
-        builder.or(article.status.eq(ArticleStatus.UPDATED_APPROVED));
-
-        return jpaQueryFactory
+        JPAQuery<Long> countQuery = jpaQueryFactory
                 .select(article.count())
                 .from(article)
                 .where(builder);
+
+        return PageableExecutionUtils.getPage(articles, pageable, countQuery::fetchOne);
     }
 }
