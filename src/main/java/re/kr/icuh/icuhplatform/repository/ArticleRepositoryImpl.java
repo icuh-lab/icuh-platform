@@ -3,8 +3,10 @@ package re.kr.icuh.icuhplatform.repository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.support.PageableExecutionUtils;
 import re.kr.icuh.icuhplatform.domain.Article;
 import re.kr.icuh.icuhplatform.domain.ArticleStatus;
 import re.kr.icuh.icuhplatform.domain.QArticle;
@@ -12,16 +14,13 @@ import re.kr.icuh.icuhplatform.dto.article.ArticleRequest;
 
 import java.util.List;
 
-@Repository
-public class ArticleQueryRepository {
+@RequiredArgsConstructor
+public class ArticleRepositoryImpl implements ArticleRepositoryCustom{
 
-    private final JPAQueryFactory queryFactory;
+    private final JPAQueryFactory jpaQueryFactory;
 
-    public ArticleQueryRepository(JPAQueryFactory queryFactory) {
-        this.queryFactory = queryFactory;
-    }
-
-    public List<Article> findApprovedArticles(ArticleRequest request, Pageable pageable) {
+    @Override
+    public Page<Article> findApprovedArticles(ArticleRequest request, Pageable pageable) {
         QArticle article = QArticle.article;
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -47,7 +46,7 @@ public class ArticleQueryRepository {
                 article.status.eq(ArticleStatus.UPDATED_APPROVED)
         );
 
-        return queryFactory
+        List<Article> articles = jpaQueryFactory
                 .selectFrom(article)
                 .leftJoin(article.documentType).fetchJoin()
                 .leftJoin(article.subjectDomain).fetchJoin()
@@ -56,19 +55,12 @@ public class ArticleQueryRepository {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-    }
 
-    public JPAQuery<Long> countApprovedArticles() {
-        QArticle article = QArticle.article;
-        BooleanBuilder builder = new BooleanBuilder();
-
-        builder.or(article.status.eq(ArticleStatus.APPROVED));
-        builder.or(article.status.eq(ArticleStatus.UPDATED_APPROVED));
-
-        return queryFactory
+        JPAQuery<Long> countQuery = jpaQueryFactory
                 .select(article.count())
                 .from(article)
                 .where(builder);
-    }
 
+        return PageableExecutionUtils.getPage(articles, pageable, countQuery::fetchOne);
+    }
 }

@@ -1,19 +1,20 @@
 package re.kr.icuh.icuhplatform.service;
 
-import com.querydsl.jpa.impl.JPAQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import re.kr.icuh.icuhplatform.domain.*;
+import re.kr.icuh.icuhplatform.dto.PageResponse;
 import re.kr.icuh.icuhplatform.dto.article.*;
 import re.kr.icuh.icuhplatform.dto.file.CreateArticleWithFilesRequest;
 import re.kr.icuh.icuhplatform.global.exception.BusinessException;
 import re.kr.icuh.icuhplatform.global.exception.ErrorCode;
-import re.kr.icuh.icuhplatform.global.util.FileUtils;
-import re.kr.icuh.icuhplatform.repository.*;
+import re.kr.icuh.icuhplatform.repository.ArticleRepository;
+import re.kr.icuh.icuhplatform.repository.DocumentTypeRepository;
+import re.kr.icuh.icuhplatform.repository.FileRepository;
+import re.kr.icuh.icuhplatform.repository.SubjectDomainRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,19 +27,13 @@ public class ArticleService {
     private final FileRepository fileRepository;
     private final DocumentTypeRepository documentTypeRepository;
     private final SubjectDomainRepository subjectDomainRepository;
-    private final ArticleQueryRepository articleQueryRepository;
-    private final FileUtils fileUtils;
 
     @Transactional(readOnly = true)
-    public Page<ArticleListResponse> findArticles(ArticleRequest request, Pageable pageable) {
-        List<Article> articles = articleQueryRepository.findApprovedArticles(request, pageable);
-        JPAQuery<Long> countQuery = articleQueryRepository.countApprovedArticles();
+    public PageResponse<ArticleListResponse> findArticles(ArticleRequest request, Pageable pageable) {
+        Page<ArticleListResponse> articleListResponsePage = articleRepository.findApprovedArticles(request, pageable)
+                .map(ArticleListResponse::fromEntity);
 
-        List<ArticleListResponse> articleListResponses = articles.stream()
-                .map(ArticleListResponse::fromEntity)
-                .collect(Collectors.toList());
-
-        return PageableExecutionUtils.getPage(articleListResponses, pageable, countQuery::fetchOne);
+        return PageResponse.from(articleListResponsePage);
     }
 
     @Transactional

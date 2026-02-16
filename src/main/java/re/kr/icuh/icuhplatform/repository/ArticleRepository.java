@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import re.kr.icuh.icuhplatform.domain.Article;
 
 @Repository
-public interface ArticleRepository extends JpaRepository<Article, Long> {
+public interface ArticleRepository extends JpaRepository<Article, Long>, ArticleRepositoryCustom {
 }
