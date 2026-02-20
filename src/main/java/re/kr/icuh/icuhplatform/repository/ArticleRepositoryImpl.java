@@ -25,11 +25,11 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom{
         BooleanBuilder builder = new BooleanBuilder();
 
         if (request.documentType() != null) {
-            builder.and(article.documentType.enName.eq(request.documentType()));
+            builder.and(article.documentType.code.eq(request.documentType()));
         }
 
         if (request.subjectDomain() != null) {
-            builder.and(article.subjectDomain.enName.eq(request.subjectDomain()));
+            builder.and(article.subjectDomain.code.eq(request.subjectDomain()));
         }
 
         if (request.source() != null) {
