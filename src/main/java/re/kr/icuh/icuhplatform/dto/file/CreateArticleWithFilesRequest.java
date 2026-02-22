@@ -11,8 +11,8 @@ public record CreateArticleWithFilesRequest(
         @NotNull String authorOrganization,
         @NotNull String department,
         @NotNull String tempPassword,
-        @NotNull Long documentTypeId,
-        @NotNull Long subjectDomainId,
+        @NotNull String documentTypeCode,
+        @NotNull String subjectDomainCode,
         @NotNull String source,
         @NotNull List<CompletedFileUpload> completedFiles
 ) {}

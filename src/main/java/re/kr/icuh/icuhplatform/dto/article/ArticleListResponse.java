@@ -27,8 +27,8 @@ public record ArticleListResponse(
                 article.getFiles().stream()
                         .map(file -> file.getExtension())
                         .collect(Collectors.toList()),
-                article.getDocumentType().getEnName(),
-                article.getSubjectDomain().getEnName(),
+                article.getDocumentType().getCode(),
+                article.getSubjectDomain().getCode(),
                 article.getSource()
         );
     }

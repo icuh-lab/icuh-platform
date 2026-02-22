@@ -37,34 +37,6 @@ public class ArticleService {
     }
 
     @Transactional
-    public CreateArticleResponse createArticle(CreateArticleRequest request) {
-        // TODO: 게시글이 생성되다가 실패하는 경우 게시글 생성 행위 자체가 rollback이 되어야한다.
-        DocumentType documentType = validateDocumentType(request.documentTypeId());
-        SubjectDomain subjectDomain = validateSubjectDomain(request.subjectDomainId());
-
-
-        Article article = Article.builder()
-                .title(request.title())
-                .description(request.description())
-                .author(request.author())
-                .authorOrganization(request.authorOrganization())
-                .department(request.department())
-                .tempPassword(request.tempPassword())
-                .views(0)
-                .status(ArticleStatus.PENDING)
-                .documentType(documentType)
-                .subjectDomain(subjectDomain)
-                .source(request.source())
-                .isDeleted(false)
-                .deletedAt(null)
-                .build();
-
-        Article savedArticleId = articleRepository.save(article);
-
-        return CreateArticleResponse.of(savedArticleId.getId());
-    }
-
-    @Transactional
     public ArticleDetailResponse findArticleById(Long id) {
         Article savedArticle = findSavedArticle(id);
         savedArticle.increaseViews();
@@ -98,8 +70,8 @@ public class ArticleService {
     public CreateArticleResponse createArticleWithFiles(CreateArticleWithFilesRequest request) {
         try {
             // 1. 게시글 저장
-            DocumentType documentType = validateDocumentType(request.documentTypeId());
-            SubjectDomain subjectDomain = validateSubjectDomain(request.subjectDomainId());
+            DocumentType documentType = validateDocumentType(request.documentTypeCode());
+            SubjectDomain subjectDomain = validateSubjectDomain(request.subjectDomainCode());
 
             Article article = Article.builder()
                     .title(request.title())
@@ -154,13 +126,13 @@ public class ArticleService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.ARTICLE_NOT_FOUND));
     }
 
-    private DocumentType validateDocumentType(Long documentTypeId) {
-        return documentTypeRepository.findById(documentTypeId)
+    private DocumentType validateDocumentType(String code) {
+        return documentTypeRepository.findByCode(code)
                 .orElseThrow(() -> new BusinessException(ErrorCode.DOCUMENT_TYPE_NOT_FOUND));
     }
 
-    private SubjectDomain validateSubjectDomain(Long subjectDomainId) {
-        return subjectDomainRepository.findById(subjectDomainId)
+    private SubjectDomain validateSubjectDomain(String code) {
+        return subjectDomainRepository.findByCode(code)
                 .orElseThrow(() -> new BusinessException(ErrorCode.SUBJECT_DOMAIN_NOT_FOUND));
     }
 }

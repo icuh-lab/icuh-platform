@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "subject_domains")
 @Getter
@@ -22,4 +24,16 @@ public class SubjectDomain {
 
     @Column(name = "en_name")
     private String enName;
+
+    @Column(name = "code")
+    private String code;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "status")
+    private String status;
 }
