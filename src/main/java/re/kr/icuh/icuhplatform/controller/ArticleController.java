@@ -37,11 +37,6 @@ public class ArticleController {
         return ApiResponse.success(articleService.findArticleById(id));
     }
 
-//    @PostMapping("/articles")
-//    public ApiResponse<CreateArticleResponse> createArticle(@Valid @RequestBody CreateArticleRequest request) {
-//        return ApiResponse.success(articleService.createArticle(request));
-//    }
-
     @PostMapping("/articles/{id}")
     public ApiResponse<ArticleDetailResponse> modifyArticleStatus(@PathVariable Long id, @RequestBody ModifyArticleStatusRequest request) {
         return ApiResponse.success(articleService.modifyArticleStatus(id, request));

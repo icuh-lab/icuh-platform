@@ -36,34 +36,6 @@ public class ArticleService {
         return PageResponse.from(articleListResponsePage);
     }
 
-//    @Transactional
-//    public CreateArticleResponse createArticle(CreateArticleRequest request) {
-//        // TODO: 게시글이 생성되다가 실패하는 경우 게시글 생성 행위 자체가 rollback이 되어야한다.
-//        DocumentType documentType = validateDocumentType(request.documentTypeId());
-//        SubjectDomain subjectDomain = validateSubjectDomain(request.subjectDomainId());
-//
-//
-//        Article article = Article.builder()
-//                .title(request.title())
-//                .description(request.description())
-//                .author(request.author())
-//                .authorOrganization(request.authorOrganization())
-//                .department(request.department())
-//                .tempPassword(request.tempPassword())
-//                .views(0)
-//                .status(ArticleStatus.PENDING)
-//                .documentType(documentType)
-//                .subjectDomain(subjectDomain)
-//                .source(request.source())
-//                .isDeleted(false)
-//                .deletedAt(null)
-//                .build();
-//
-//        Article savedArticleId = articleRepository.save(article);
-//
-//        return CreateArticleResponse.of(savedArticleId.getId());
-//    }
-
     @Transactional
     public ArticleDetailResponse findArticleById(Long id) {
         Article savedArticle = findSavedArticle(id);
