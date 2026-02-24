@@ -11,10 +11,10 @@ public record UpdateArticleRequest(
         @NotNull String authorOrganization,
         @NotNull String department,
         @NotNull String tempPassword,
-        @NotNull Long documentTypeId,
-        @NotNull Long subjectDomainId,
+        @NotNull String documentTypeCode,
+        @NotNull String subjectDomainCode,
         @NotNull String source,
-        List<NewFileRequest>newFiles
+        List<NewFileRequest> newFiles
 ) {
     public record NewFileRequest(
             String originalFileName,
