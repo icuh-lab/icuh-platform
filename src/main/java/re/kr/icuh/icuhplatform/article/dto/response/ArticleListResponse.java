@@ -3,8 +3,6 @@ package re.kr.icuh.icuhplatform.article.dto.response;
 import re.kr.icuh.icuhplatform.article.domain.Article;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public record ArticleListResponse(
         Long id,
@@ -12,7 +10,6 @@ public record ArticleListResponse(
         String authorOrganization,
         LocalDateTime updatedAt,
         Integer views,
-        List<String> extensions,
         String documentType,
         String subjectDomain,
         String source
@@ -24,9 +21,6 @@ public record ArticleListResponse(
                 article.getAuthorOrganization(),
                 article.getUpdatedAt(),
                 article.getViews(),
-                article.getFiles().stream()
-                        .map(file -> file.getExtension())
-                        .collect(Collectors.toList()),
                 article.getDocumentType().getCode(),
                 article.getSubjectDomain().getCode(),
                 article.getSource()
