@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
 
+	// 규약: 각 상수의 code 문자열은 enum 상수 이름과 동일하게 정의한다 (ErrorCodeTest가 불변식으로 강제).
+
 	/**
 	 * 400 Bad Request
 	 */
@@ -38,7 +40,7 @@ public enum ErrorCode {
 	 * 500 Internal Server Error
 	 */
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR", "서버 내부 오류가 발생했습니다."),
-    FILE_DOWNLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR", "파일 다운로드 중 오류가 발생했습니다.");
+	FILE_DOWNLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FILE_DOWNLOAD_ERROR", "파일 다운로드 중 오류가 발생했습니다.");
 
 
     private final HttpStatus status;
