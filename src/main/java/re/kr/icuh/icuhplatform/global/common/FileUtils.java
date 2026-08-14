@@ -25,8 +25,4 @@ public class FileUtils {
         int position = originName.lastIndexOf(".");
         return position > -1 ? originName.substring(position + 1) : "";
     }
-
-    /**
-     * 파일 크기를 Integer로 변환합니다.
-     */
 }
