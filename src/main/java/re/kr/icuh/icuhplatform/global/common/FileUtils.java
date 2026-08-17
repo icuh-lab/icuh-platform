@@ -22,6 +22,9 @@ public class FileUtils {
      * 파일명에서 확장자를 추출합니다.
      */
     public String extractExtensionName(String originName) {
+        if (originName == null) {
+            return "";
+        }
         int position = originName.lastIndexOf(".");
         return position > -1 ? originName.substring(position + 1) : "";
     }
