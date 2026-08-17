@@ -108,7 +108,8 @@ public class Article {
 
     public void delete() {
         this.status = ArticleStatus.DELETED_PENDING;
-        this.updatedAt = LocalDateTime.now();
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
     }
 
     public void increaseViews() {
