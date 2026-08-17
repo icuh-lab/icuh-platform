@@ -10,6 +10,8 @@ import re.kr.icuh.icuhplatform.article.dto.request.UpdateArticleRequest;
 import re.kr.icuh.icuhplatform.category.domain.DocumentType;
 import re.kr.icuh.icuhplatform.category.domain.SubjectDomain;
 import re.kr.icuh.icuhplatform.file.domain.FileEntity;
+import re.kr.icuh.icuhplatform.global.common.BusinessException;
+import re.kr.icuh.icuhplatform.global.common.ErrorCode;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -110,6 +112,13 @@ public class Article {
         this.status = ArticleStatus.DELETED_PENDING;
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now();
+    }
+
+    public void reject() {
+        if (this.status != ArticleStatus.PENDING) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT);
+        }
+        this.status = ArticleStatus.REJECTED;
     }
 
     public void increaseViews() {

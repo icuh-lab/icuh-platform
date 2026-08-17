@@ -1,6 +1,7 @@
 package re.kr.icuh.icuhplatform.article.application;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import re.kr.icuh.icuhplatform.global.common.PageResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ArticleService {
@@ -55,6 +57,8 @@ public class ArticleService {
     public ArticleDetailResponse modifyArticleStatus(Long id, ModifyArticleStatusRequest request) {
         Article article = findSavedArticle(id);
         validatePassword(article, request.password());
+        article.reject();
+        log.info("게시글 거절 처리: id={}, reason={}", id, request.reason());
 
         return ArticleDetailResponse.of(article);
     }

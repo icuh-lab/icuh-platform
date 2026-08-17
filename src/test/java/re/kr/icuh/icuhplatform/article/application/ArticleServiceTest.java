@@ -6,8 +6,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import re.kr.icuh.icuhplatform.article.domain.Article;
+import re.kr.icuh.icuhplatform.article.domain.ArticleStatus;
 import re.kr.icuh.icuhplatform.article.dto.request.CreateArticleWithFilesRequest;
+import re.kr.icuh.icuhplatform.article.dto.request.ModifyArticleStatusRequest;
 import re.kr.icuh.icuhplatform.article.infra.ArticleRepository;
+import re.kr.icuh.icuhplatform.category.domain.DocumentType;
+import re.kr.icuh.icuhplatform.category.domain.SubjectDomain;
 import re.kr.icuh.icuhplatform.category.infra.DocumentTypeRepository;
 import re.kr.icuh.icuhplatform.category.infra.SubjectDomainRepository;
 import re.kr.icuh.icuhplatform.file.infra.FileRepository;
@@ -68,5 +73,35 @@ class ArticleServiceTest {
                 () -> articleService.createArticleWithFiles(request));
         assertThat(thrown.getErrorCode()).isEqualTo(ErrorCode.DOCUMENT_TYPE_NOT_FOUND);
         assertThat(thrown.getErrorCode()).isNotEqualTo(ErrorCode.FILE_SIZE_EXCEEDED);
+    }
+
+    @Test
+    @DisplayName("modifyArticleStatus는 PENDING 게시글을 REJECTED로 전이한다")
+    void modifyArticleStatus_PENDING을_REJECTED로_전이한다() {
+        // given
+        DocumentType documentType = new DocumentType(1L, "문서성격", "docType", "DOC", null, null, "ACTIVE");
+        SubjectDomain subjectDomain = new SubjectDomain(1L, "주제영역", "subject", "SUB", null, null, "ACTIVE");
+        Article article = Article.builder()
+                .title("제목")
+                .description("내용")
+                .author("작성자")
+                .authorOrganization("작성기관")
+                .department("부서")
+                .tempPassword("1234")
+                .views(0)
+                .status(ArticleStatus.PENDING)
+                .documentType(documentType)
+                .subjectDomain(subjectDomain)
+                .source("출처")
+                .isDeleted(false)
+                .deletedAt(null)
+                .build();
+        when(articleRepository.findById(1L)).thenReturn(Optional.of(article));
+
+        // when
+        articleService.modifyArticleStatus(1L, new ModifyArticleStatusRequest("1234", "부적절한 문서"));
+
+        // then
+        assertThat(article.getStatus()).isEqualTo(ArticleStatus.REJECTED);
     }
 }
