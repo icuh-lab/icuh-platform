@@ -3,6 +3,7 @@ package re.kr.icuh.icuhplatform.file.api;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,7 +47,7 @@ public class FileController {
     private String bucketName;
 
     @PostMapping("/generate-upload-id")
-    public ResponseEntity<InitiateUploadResponseDto> generateUploadId(@RequestBody InitiateUploadRequestDto request) {
+    public ResponseEntity<InitiateUploadResponseDto> generateUploadId(@Valid @RequestBody InitiateUploadRequestDto request) {
         // NOTE: 원본 파일명, 디비에 저장될 파일명, 파일 사이즈를 기반으로 파일 메타데이터 생성
         FileUtils fileUtils = new FileUtils();
         String storedFileName = fileUtils.createStoreFileName(request.getFileName());
@@ -80,7 +81,7 @@ public class FileController {
     }
 
     @PostMapping("/complete-upload")
-    public ResponseEntity<CompleteUploadResponseDto> completeUpload(@RequestBody CompleteUploadRequestDto request) {
+    public ResponseEntity<CompleteUploadResponseDto> completeUpload(@Valid @RequestBody CompleteUploadRequestDto request) {
 
         List<PartETag> partETags = request.getParts().stream()
                 .map(part -> new PartETag(part.getPartNumber(), part.getEtag()))
@@ -108,7 +109,7 @@ public class FileController {
     }
 
     @PostMapping("/update-upload")
-    public ResponseEntity<CompleteUploadResponseDto> updateUpload(@RequestBody CompleteUploadRequestDto request) {
+    public ResponseEntity<CompleteUploadResponseDto> updateUpload(@Valid @RequestBody CompleteUploadRequestDto request) {
 
         // 클라이언트가 보낸 etag 리스트를 AWS SDK용 PartETag 리스트로 변환
         List<PartETag> partETags = request.getParts().stream()
