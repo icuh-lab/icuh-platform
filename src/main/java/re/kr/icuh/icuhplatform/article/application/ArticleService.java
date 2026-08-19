@@ -75,51 +75,46 @@ public class ArticleService {
 
     @Transactional
     public CreateArticleResponse createArticleWithFiles(CreateArticleWithFilesRequest request) {
-        try {
-            // 1. 게시글 저장
-            DocumentType documentType = validateDocumentType(request.documentTypeCode());
-            SubjectDomain subjectDomain = validateSubjectDomain(request.subjectDomainCode());
+        // 1. 게시글 저장
+        DocumentType documentType = validateDocumentType(request.documentTypeCode());
+        SubjectDomain subjectDomain = validateSubjectDomain(request.subjectDomainCode());
 
-            Article article = Article.builder()
-                    .title(request.title())
-                    .description(request.description())
-                    .author(request.author())
-                    .authorOrganization(request.authorOrganization())
-                    .department(request.department())
-                    .tempPassword(request.tempPassword())
-                    .views(0)
-                    .status(ArticleStatus.PENDING)
-                    .documentType(documentType)
-                    .subjectDomain(subjectDomain)
-                    .source(request.source())
-                    .isDeleted(false)
-                    .deletedAt(null)
-                    .build();
+        Article article = Article.builder()
+                .title(request.title())
+                .description(request.description())
+                .author(request.author())
+                .authorOrganization(request.authorOrganization())
+                .department(request.department())
+                .tempPassword(request.tempPassword())
+                .views(0)
+                .status(ArticleStatus.PENDING)
+                .documentType(documentType)
+                .subjectDomain(subjectDomain)
+                .source(request.source())
+                .isDeleted(false)
+                .deletedAt(null)
+                .build();
 
-            articleRepository.save(article);
+        articleRepository.save(article);
 
 
-            // 2. 파일 메타데이터 저장 (게시글 ID와 연결)
-            List<FileEntity> files = request.completedFiles().stream()
-                    .map(fileInfo -> FileEntity.builder()
-                            .article(article)
-                            .originalFilename(fileInfo.originalFileName())
-                            .storedFilename(fileInfo.storedFileName())
-                            .filePath(fileInfo.filePath())
-                            .fileSize(fileInfo.fileSize())
-                            .extension(fileInfo.extension())
-                            .status(FileStatus.PENDING)
-                            .build()
-                    )
-                    .collect(Collectors.toList());
+        // 2. 파일 메타데이터 저장 (게시글 ID와 연결)
+        List<FileEntity> files = request.completedFiles().stream()
+                .map(fileInfo -> FileEntity.builder()
+                        .article(article)
+                        .originalFilename(fileInfo.originalFileName())
+                        .storedFilename(fileInfo.storedFileName())
+                        .filePath(fileInfo.filePath())
+                        .fileSize(fileInfo.fileSize())
+                        .extension(fileInfo.extension())
+                        .status(FileStatus.PENDING)
+                        .build()
+                )
+                .collect(Collectors.toList());
 
-            fileRepository.saveAll(files);
+        fileRepository.saveAll(files);
 
-            return CreateArticleResponse.of(article.getId());
-        } catch (Exception e) {
-            // 실패 시: 업로드된 S3 파일 삭제 + 에러 응답
-            throw new BusinessException(ErrorCode.FILE_SIZE_EXCEEDED);
-        }
+        return CreateArticleResponse.of(article.getId());
     }
 
     private static void validatePassword(Article article, String password) {

@@ -8,7 +8,7 @@ import org.springframework.util.StringUtils;
 import re.kr.icuh.icuhplatform.article.dto.request.UpdateArticleRequest;
 
 @Converter
-public class UpdateArticleRequestJsonConverter<T> implements AttributeConverter<UpdateArticleRequest, String> {
+public class UpdateArticleRequestJsonConverter implements AttributeConverter<UpdateArticleRequest, String> {
 
     private final ObjectMapper objectMapper;
 
