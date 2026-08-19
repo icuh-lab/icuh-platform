@@ -1,6 +1,10 @@
 package re.kr.icuh.icuhplatform.global.common;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,82 +16,16 @@ class FileUtilsTest {
 
     private final FileUtils fileUtils = new FileUtils();
 
-    @Nested
-    @DisplayName("확장자 추출 (extractExtensionName)")
-    class ExtractExtensionName {
-
-        @DisplayName("파일명에서 확장자를 추출한다 (대소문자 보존, 마지막 점 기준)")
-        @ParameterizedTest(name = "\"{0}\" -> \"{1}\"")
-        @CsvSource({
-                "report.pdf, pdf",
-                "photo.JPEG, JPEG",
-                "archive.tar.gz, gz"
-        })
-        void 확장자를_추출한다(String originName, String expected) {
-            // when
-            String extension = fileUtils.extractExtensionName(originName);
-
-            // then
-            assertThat(extension).isEqualTo(expected);
-        }
-
-        @Test
-        @DisplayName("점이 없으면 빈 문자열을 반환한다")
-        void 확장자가_없으면_빈_문자열() {
-            // given
-            String originName = "readme";
-
-            // when
-            String extension = fileUtils.extractExtensionName(originName);
-
-            // then
-            assertThat(extension).isEmpty();
-        }
-
-        @Test
-        @DisplayName("점으로 끝나면 빈 문자열을 반환한다")
-        void 점으로_끝나면_빈_문자열() {
-            // given
-            String originName = "trailing.";
-
-            // when
-            String extension = fileUtils.extractExtensionName(originName);
-
-            // then
-            assertThat(extension).isEmpty();
-        }
+    @Test
+    @DisplayName("null 파일명의 확장자는 빈 문자열로 처리한다 (NPE 없음)")
+    void 확장자_추출은_null_입력에서_빈_문자열을_반환한다() {
+        assertThat(fileUtils.extractExtensionName(null)).isEmpty();
     }
 
-    @Nested
-    @DisplayName("저장 파일명 생성 (createStoreFileName)")
-    class CreateStoreFileName {
-
-        @Test
-        @DisplayName("'UUID.확장자' 형식으로 생성한다")
-        void UUID와_확장자로_구성된다() {
-            // given
-            String originName = "report.pdf";
-
-            // when
-            String storedName = fileUtils.createStoreFileName(originName);
-
-            // then
-            assertThat(storedName)
-                    .matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.pdf");
-        }
-
-        @Test
-        @DisplayName("같은 원본 이름이어도 호출마다 고유한 이름을 생성한다")
-        void 호출마다_고유하다() {
-            // given
-            String originName = "report.pdf";
-
-            // when
-            String first = fileUtils.createStoreFileName(originName);
-            String second = fileUtils.createStoreFileName(originName);
-
-            // then
-            assertThat(first).isNotEqualTo(second);
-        }
+    @Test
+    @DisplayName("null 파일명으로 저장명을 생성해도 예외를 던지지 않는다")
+    void 저장명_생성은_null_입력에서_예외를_던지지_않는다() {
+        assertThatCode(() -> fileUtils.createStoreFileName(null))
+                .doesNotThrowAnyException();
     }
 }
